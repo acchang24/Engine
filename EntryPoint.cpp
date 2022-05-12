@@ -1,4 +1,6 @@
+#include "stdafx.h"
 #include <Windows.h>
+#include <sstream>
 
 // Define a custom windows procedure
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -7,6 +9,35 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_CLOSE:
 		PostQuitMessage(69);
+		break;
+	case WM_KEYDOWN:
+		if (wParam == 'F')
+		{
+			SetWindowText(hWnd, L"Respect");
+		}
+		break;
+	case WM_KEYUP:
+		if (wParam == 'F')
+		{
+			SetWindowText(hWnd, L"Engine");
+		}
+		break;
+	case WM_CHAR:
+		{
+			static std::wstring title;
+			title.push_back((char)wParam);
+			SetWindowText(hWnd, title.c_str());
+		}
+		break;
+	case WM_LBUTTONDOWN:
+		{
+			POINTS pt = MAKEPOINTS(lParam);
+			std::ostringstream oss;
+			oss << "(" << pt.x << "," << pt.y << ")";
+			std::string s = oss.str();
+			std::wstring t(s.begin(), s.end());
+			SetWindowText(hWnd, t.c_str());
+		}
 		break;
 	}
 
@@ -77,10 +108,8 @@ int CALLBACK WinMain(
 	}
 	else
 	{
-		return msg.wParam;
+		return (int)msg.wParam;
 	}
-
-
 
 	return 0;
 }
