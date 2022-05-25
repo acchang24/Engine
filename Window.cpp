@@ -1,11 +1,12 @@
 #include "stdafx.h"
 #include "Window.h"
 #include <sstream>
+#include "WindowException.h"
 
 // WindowClass
 Window::WindowClass Window::WindowClass::wndClass;
 
-Window::WindowClass::WindowClass() noexcept 
+Window::WindowClass::WindowClass() 
 	: hInst(GetModuleHandle(nullptr)) // GetModuleHandle to save instance
 {
 	// Register a window class
@@ -33,19 +34,19 @@ Window::WindowClass::~WindowClass()
 	UnregisterClass(wndClassName, GetInstance());
 }
 
-const wchar_t* Window::WindowClass::GetName() noexcept
+const wchar_t* Window::WindowClass::GetName()
 {
 	return wndClassName;
 }
 
-HINSTANCE Window::WindowClass::GetInstance() noexcept
+HINSTANCE Window::WindowClass::GetInstance()
 {
 	return wndClass.hInst;
 }
 
 //------------------------------------------------------------------
 // Window
-Window::Window(int width, int height, const wchar_t* name) noexcept 
+Window::Window(int width, int height, const wchar_t* name) 
 	: mWidth(width)
 	, mHeight(height)
 {
@@ -55,8 +56,15 @@ Window::Window(int width, int height, const wchar_t* name) noexcept
 	wr.right = width + wr.left;
 	wr.top = 100;
 	wr.bottom = height + wr.top;
-	AdjustWindowRect(&wr, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX, FALSE);
+	// AdjustWindowRect
+	if (FAILED(AdjustWindowRect(&wr, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX, FALSE)))
+	{
+		throw WND_LAST_EXCEPT();
+	}
+	//AdjustWindowRect(&wr, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX, FALSE);
 	
+	//throw WND_EXCEPT(ERROR_ARENA_TRASHED);
+
 	// Create window and get hWnd
 	hWnd = CreateWindowEx(
 		0,
@@ -68,7 +76,13 @@ Window::Window(int width, int height, const wchar_t* name) noexcept
 		nullptr,
 		WindowClass::GetInstance(),
 		this);
-	
+	// Check for errror
+	if (hWnd == nullptr)
+	{
+		throw WND_LAST_EXCEPT();
+	}
+
+
 	// Show the window
 	ShowWindow(hWnd, SW_SHOWDEFAULT);
 }
@@ -79,9 +93,8 @@ Window::~Window()
 	DestroyWindow(hWnd);
 }
 
-LRESULT CALLBACK Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+LRESULT CALLBACK Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	// Use 
 	if (msg == WM_NCCREATE)
 	{
 		// extract ptr to window class from creation data
@@ -96,7 +109,7 @@ LRESULT CALLBACK Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPAR
 	}
 }
 
-LRESULT CALLBACK Window::HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+LRESULT CALLBACK Window::HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	// Pointer to window class
 	Window* const pWnd = reinterpret_cast<Window*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
@@ -104,7 +117,7 @@ LRESULT CALLBACK Window::HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPAR
 	return pWnd->HandleMessage(hWnd, msg, wParam, lParam);
 }
 
-LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -112,7 +125,7 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case WM_CLOSE:
 			PostQuitMessage(0);
 			return 0;
-		case WM_KEYDOWN:
+		/*case WM_KEYDOWN:
 			if (wParam == 'F')
 			{
 				SetWindowText(hWnd, L"Respect");
@@ -139,7 +152,7 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			std::string s = oss.str();
 			std::wstring t(s.begin(), s.end());
 			SetWindowText(hWnd, t.c_str());
-		}
+		}*/
 		break;
 	}
 

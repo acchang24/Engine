@@ -56,6 +56,7 @@
 #include <tchar.h>
 #include <stdint.h>
 #include <string>
+#include <sstream>
 #include <unordered_map>
 #include <chrono>
 
