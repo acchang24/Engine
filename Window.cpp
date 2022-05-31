@@ -4,6 +4,8 @@
 #include "WindowException.h"
 #include "Resource.h"
 
+
+
 // WindowClass
 Window::WindowClass Window::WindowClass::wndClass;
 
@@ -51,6 +53,7 @@ Window::Window(int width, int height, const wchar_t* name)
 	: mWidth(width)
 	, mHeight(height)
 {
+	mKeyboard = new Keyboard();
 	// Calculates the window size based on client region size
 	RECT wr;
 	wr.left = 100;
@@ -58,13 +61,10 @@ Window::Window(int width, int height, const wchar_t* name)
 	wr.top = 100;
 	wr.bottom = height + wr.top;
 	// AdjustWindowRect
-	if (FAILED(AdjustWindowRect(&wr, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX, FALSE)))
+	if (FALSE == (AdjustWindowRect(&wr, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX, FALSE)))
 	{
 		throw WND_LAST_EXCEPT();
 	}
-	//AdjustWindowRect(&wr, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX, FALSE);
-	
-	//throw WND_EXCEPT(ERROR_ARENA_TRASHED);
 
 	// Create window and get hWnd
 	hWnd = CreateWindowEx(
@@ -90,6 +90,7 @@ Window::Window(int width, int height, const wchar_t* name)
 
 Window::~Window()
 {
+	delete mKeyboard;
 	// Destroys window
 	DestroyWindow(hWnd);
 }
@@ -126,35 +127,27 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case WM_CLOSE:
 			PostQuitMessage(0);
 			return 0;
-		/*case WM_KEYDOWN:
-			if (wParam == 'F')
+		// Clear keystate when the window loses focus to prevent zombie inputs
+		case WM_KILLFOCUS:
+			mKeyboard->ClearState();
+			break;
+
+		// -------KEYBOARD MESSAGES-------// 
+		case WM_KEYDOWN:
+		// Use SYSKEY to handle system keys as well
+		case WM_SYSKEYDOWN:
+			if (!(lParam & 0x40000000) || mKeyboard->AutorepeatIsEnabled())
 			{
-				SetWindowText(hWnd, L"Respect");
+				mKeyboard->OnKeyPress(static_cast<unsigned int>(wParam));
 			}
 			break;
 		case WM_KEYUP:
-			if (wParam == 'F')
-			{
-				SetWindowText(hWnd, L"Engine");
-			}
+		case WM_SYSKEYUP:
+			mKeyboard->OnKeyRelease(static_cast<unsigned int>(wParam));
 			break;
 		case WM_CHAR:
-		{
-			static std::wstring title;
-			title.push_back((char)wParam);
-			SetWindowText(hWnd, title.c_str());
-		}
-		break;
-		case WM_LBUTTONDOWN:
-		{
-			POINTS pt = MAKEPOINTS(lParam);
-			std::ostringstream oss;
-			oss << "(" << pt.x << "," << pt.y << ")";
-			std::string s = oss.str();
-			std::wstring t(s.begin(), s.end());
-			SetWindowText(hWnd, t.c_str());
-		}*/
-		break;
+			mKeyboard->OnChar(static_cast<char>(wParam));
+			break;
 	}
 
 	return DefWindowProc(hWnd, msg, wParam, lParam);

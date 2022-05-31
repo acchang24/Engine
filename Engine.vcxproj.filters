@@ -29,6 +29,9 @@
     <ClCompile Include="WindowException.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Keyboard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -49,7 +52,10 @@
     <ClInclude Include="WindowException.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Resource.h" />
+    <ClInclude Include="Resource.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Keyboard.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Engine.rc">

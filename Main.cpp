@@ -11,7 +11,6 @@ int APIENTRY wWinMain(
 	try
 	{
 		Window wnd(800, 600, L"Engine");
-		//Window wnd2(400, 300, L"This is another window");
 
 		MSG msg;
 		BOOL gResult;
@@ -19,6 +18,15 @@ int APIENTRY wWinMain(
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
+
+			if (wnd.mKeyboard->KeyIsPressed(VK_MENU))
+			{
+				MessageBox(nullptr, L"Something HapponNN!", L"Alt Key Was Pressed", MB_OK | MB_ICONEXCLAMATION);
+			}
+			if (wnd.mKeyboard->KeyIsPressed('A'))
+			{
+				MessageBox(nullptr, L"Something HapponNN!", L"A Key Was Pressed", MB_OK | MB_ICONEXCLAMATION);
+			}
 		}
 
 		if (gResult == -1)
