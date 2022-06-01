@@ -13,6 +13,7 @@ public:
 
 	void SetTitle(const std::wstring& title);
 
+
 	Keyboard* mKeyboard;
 	Mouse* mMouse;
 

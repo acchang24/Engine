@@ -35,6 +35,12 @@
     <ClCompile Include="Mouse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="App.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LoopTimer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -64,6 +70,10 @@
     <ClInclude Include="Mouse.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="App.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LoopTimer.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Engine.rc">

@@ -155,9 +155,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="App.cpp" />
     <ClCompile Include="DbgAssert.cpp" />
     <ClCompile Include="Exception.cpp" />
     <ClCompile Include="Keyboard.cpp" />
+    <ClCompile Include="LoopTimer.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -170,9 +172,11 @@
     <ClCompile Include="WindowException.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="App.h" />
     <ClInclude Include="DbgAssert.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="LoopTimer.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
