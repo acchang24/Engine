@@ -15,6 +15,6 @@ private:
 
 	bool running;
 	Window wnd;
-	LoopTimer timer;
+	//LoopTimer timer;
 };
 

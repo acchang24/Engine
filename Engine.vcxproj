@@ -155,40 +155,40 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="App.cpp" />
-    <ClCompile Include="DbgAssert.cpp" />
-    <ClCompile Include="Exception.cpp" />
-    <ClCompile Include="Keyboard.cpp" />
-    <ClCompile Include="LoopTimer.cpp" />
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Mouse.cpp" />
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="Engine\App.cpp" />
+    <ClCompile Include="Engine\DbgAssert.cpp" />
+    <ClCompile Include="Engine\Exception.cpp" />
+    <ClCompile Include="Engine\Keyboard.cpp" />
+    <ClCompile Include="Engine\LoopTimer.cpp" />
+    <ClCompile Include="Engine\Main.cpp" />
+    <ClCompile Include="Engine\Mouse.cpp" />
+    <ClCompile Include="Engine\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Window.cpp" />
-    <ClCompile Include="WindowException.cpp" />
+    <ClCompile Include="Engine\Window.cpp" />
+    <ClCompile Include="Engine\WindowException.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="App.h" />
-    <ClInclude Include="DbgAssert.h" />
-    <ClInclude Include="Exception.h" />
-    <ClInclude Include="Keyboard.h" />
-    <ClInclude Include="LoopTimer.h" />
-    <ClInclude Include="Mouse.h" />
-    <ClInclude Include="Resource.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="targetver.h" />
-    <ClInclude Include="Window.h" />
-    <ClInclude Include="WindowException.h" />
+    <ClInclude Include="Engine\App.h" />
+    <ClInclude Include="Engine\DbgAssert.h" />
+    <ClInclude Include="Engine\Exception.h" />
+    <ClInclude Include="Engine\Keyboard.h" />
+    <ClInclude Include="Engine\LoopTimer.h" />
+    <ClInclude Include="Engine\Mouse.h" />
+    <ClInclude Include="Engine\Resource.h" />
+    <ClInclude Include="Engine\stdafx.h" />
+    <ClInclude Include="Engine\targetver.h" />
+    <ClInclude Include="Engine\Window.h" />
+    <ClInclude Include="Engine\WindowException.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Engine.rc" />
+    <ResourceCompile Include="Engine\Engine.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="game.ico" />
+    <Image Include="Engine\game.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
