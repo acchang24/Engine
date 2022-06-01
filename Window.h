@@ -1,5 +1,6 @@
 #pragma once
 #include "Keyboard.h"
+#include "Mouse.h"
 
 // Class to represent a window and encapsulates the creation, destruction, and message handling for a window
 class Window
@@ -10,7 +11,10 @@ public:
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
 
+	void SetTitle(const std::wstring& title);
+
 	Keyboard* mKeyboard;
+	Mouse* mMouse;
 
 private:
 	// Singleton that manages the registration and cleanup of window class

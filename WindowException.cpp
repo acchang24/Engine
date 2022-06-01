@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "WindowException.h"
-#include <codecvt>
 
 WindowException::WindowException(int line, const char* file, HRESULT result)
 	: Exception(line, file)

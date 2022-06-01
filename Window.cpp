@@ -1,10 +1,7 @@
 #include "stdafx.h"
 #include "Window.h"
-#include <sstream>
 #include "WindowException.h"
 #include "Resource.h"
-
-
 
 // WindowClass
 Window::WindowClass Window::WindowClass::wndClass;
@@ -54,6 +51,8 @@ Window::Window(int width, int height, const wchar_t* name)
 	, mHeight(height)
 {
 	mKeyboard = new Keyboard();
+	mMouse = new Mouse();
+
 	// Calculates the window size based on client region size
 	RECT wr;
 	wr.left = 100;
@@ -91,8 +90,17 @@ Window::Window(int width, int height, const wchar_t* name)
 Window::~Window()
 {
 	delete mKeyboard;
+	delete mMouse;
 	// Destroys window
 	DestroyWindow(hWnd);
+}
+
+void Window::SetTitle(const std::wstring& title)
+{
+	if (SetWindowText(hWnd, title.c_str()) == FALSE)
+	{
+		throw WND_LAST_EXCEPT();
+	}
 }
 
 LRESULT CALLBACK Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -132,7 +140,7 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			mKeyboard->ClearState();
 			break;
 
-		// -------KEYBOARD MESSAGES-------// 
+		// -------KEYBOARD MESSAGES------- // 
 		case WM_KEYDOWN:
 		// Use SYSKEY to handle system keys as well
 		case WM_SYSKEYDOWN:
@@ -148,6 +156,76 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case WM_CHAR:
 			mKeyboard->OnChar(static_cast<char>(wParam));
 			break;
+
+		// -------MOUSE MESSAGES------- //
+		case WM_MOUSEMOVE:
+		{
+			const POINTS pt = MAKEPOINTS(lParam);
+			// If cursor is in client region, log the move event
+			if (pt.x >= 0 && pt.x <= mWidth && pt.y >= 0 && pt.y <= mHeight)
+			{
+				mMouse->OnMouseMove(pt.x, pt.y);
+				// If current mouse state is not in window, capture mouse and set on enter
+				SetCapture(hWnd);
+				mMouse->OnMouseEnter();
+			}
+			// If cursor is not in client, log the move and maintain capture if a click is held (dragging outside of window)
+			else
+			{
+				if (wParam & (MK_LBUTTON | MK_RBUTTON))
+				{
+					mMouse->OnMouseMove(pt.x, pt.y);
+				}
+				// Button up or no clock, release capture and log event for leaving
+				else
+				{
+					ReleaseCapture();
+					mMouse->OnMouseLeave();
+				}
+			}
+			break;
+		}
+		case WM_LBUTTONDOWN:
+		{
+			const POINTS pt = MAKEPOINTS(lParam);
+			mMouse->OnLeftClick(pt.x, pt.y);
+			break;
+		}
+		case WM_RBUTTONDOWN:
+		{
+			const POINTS pt = MAKEPOINTS(lParam);
+			mMouse->OnRightClick(pt.x, pt.y);
+			break;
+		}
+		case WM_LBUTTONUP:
+		{
+			const POINTS pt = MAKEPOINTS(lParam);
+			mMouse->OnLeftRelease(pt.x, pt.y);
+			break;
+		}
+		case WM_RBUTTONUP:
+		{
+			const POINTS pt = MAKEPOINTS(lParam);
+			mMouse->OnRightRelease(pt.x, pt.y);
+			break;
+		}
+		case WM_MOUSEWHEEL:
+		{
+			const POINTS pt = MAKEPOINTS(lParam);
+			// Get how much change per scroll
+			const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
+			// Pass in mouse pos and scroll change to OnWheelDelta
+			mMouse->OnWheelDelta(pt.x, pt.y, delta);
+			/*if (GET_WHEEL_DELTA_WPARAM(wParam) > 0)
+			{
+				mMouse->OnWheelUp(pt.x, pt.y);
+			}
+			else if (GET_WHEEL_DELTA_WPARAM(wParam) < 0)
+			{
+				mMouse->OnWheelDown(pt.x, pt.y);
+			}*/
+			break;
+		}
 	}
 
 	return DefWindowProc(hWnd, msg, wParam, lParam);
