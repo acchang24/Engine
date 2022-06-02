@@ -44,6 +44,9 @@ public:
 
 	Keyboard();
 	~Keyboard();
+	Keyboard(const Keyboard&) = delete;
+	Keyboard& operator=(const Keyboard&) = delete;
+
 	// Key event
 	bool KeyIsPressed(unsigned char keycode) const;
 	Event ReadKey();

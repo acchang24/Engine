@@ -82,9 +82,11 @@ Window::Window(int width, int height, const wchar_t* name)
 		throw WND_LAST_EXCEPT();
 	}
 
-
 	// Show the window
 	ShowWindow(hWnd, SW_SHOWDEFAULT);
+
+	// Create Graphics object
+	mGraphics = std::make_unique<Graphics>(hWnd);
 }
 
 Window::~Window()
@@ -216,14 +218,6 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
 			// Pass in mouse pos and scroll change to OnWheelDelta
 			mMouse->OnWheelDelta(pt.x, pt.y, delta);
-			/*if (GET_WHEEL_DELTA_WPARAM(wParam) > 0)
-			{
-				mMouse->OnWheelUp(pt.x, pt.y);
-			}
-			else if (GET_WHEEL_DELTA_WPARAM(wParam) < 0)
-			{
-				mMouse->OnWheelDown(pt.x, pt.y);
-			}*/
 			break;
 		}
 	}

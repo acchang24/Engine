@@ -158,6 +158,7 @@
     <ClCompile Include="Engine\App.cpp" />
     <ClCompile Include="Engine\DbgAssert.cpp" />
     <ClCompile Include="Engine\Exception.cpp" />
+    <ClCompile Include="Engine\Graphics.cpp" />
     <ClCompile Include="Engine\Keyboard.cpp" />
     <ClCompile Include="Engine\LoopTimer.cpp" />
     <ClCompile Include="Engine\Main.cpp" />
@@ -175,12 +176,12 @@
     <ClInclude Include="Engine\App.h" />
     <ClInclude Include="Engine\DbgAssert.h" />
     <ClInclude Include="Engine\Exception.h" />
+    <ClInclude Include="Engine\Graphics.h" />
     <ClInclude Include="Engine\Keyboard.h" />
     <ClInclude Include="Engine\LoopTimer.h" />
     <ClInclude Include="Engine\Mouse.h" />
     <ClInclude Include="Engine\Resource.h" />
     <ClInclude Include="Engine\stdafx.h" />
-    <ClInclude Include="Engine\targetver.h" />
     <ClInclude Include="Engine\Window.h" />
     <ClInclude Include="Engine\WindowException.h" />
   </ItemGroup>

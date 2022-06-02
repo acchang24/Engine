@@ -1,6 +1,8 @@
 #pragma once
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "Graphics.h"
+#include <memory>
 
 // Class to represent a window and encapsulates the creation, destruction, and message handling for a window
 class Window
@@ -13,6 +15,7 @@ public:
 
 	void SetTitle(const std::wstring& title);
 
+	Graphics& GetGraphics() { return *mGraphics; }
 
 	Keyboard* mKeyboard;
 	Mouse* mMouse;
@@ -42,4 +45,5 @@ private:
 	int mWidth;
 	int mHeight;
 	HWND hWnd;
+	std::unique_ptr<Graphics> mGraphics;
 };

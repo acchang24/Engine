@@ -6,7 +6,7 @@
 #pragma once
 
 // Includes SDKDDKVer.h
-#include "targetver.h"					
+#include <sdkddkver.h>				
 
  // Exclude rarely-used stuff from Windows headers
 #define WIN32_LEAN_AND_MEAN            
@@ -46,7 +46,7 @@
 #define STRICT
 
 // Windows Header Files:
-#include <windows.h>
+#include <Windows.h>
 #include <d3d11.h>
 
 // C RunTime Header Files
