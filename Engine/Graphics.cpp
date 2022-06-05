@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Graphics.h"
+#pragma comment (lib, "d3d11.lib") 
 
 Graphics::Graphics(HWND hWnd)
 	: mSwapChain(nullptr)
@@ -8,7 +9,6 @@ Graphics::Graphics(HWND hWnd)
 	, mBackBuffer(nullptr)
 {
 	HRESULT hr = S_OK;
-
 	{
 		// Setup swap chain
 		DXGI_SWAP_CHAIN_DESC sd;
@@ -21,12 +21,12 @@ Graphics::Graphics(HWND hWnd)
 		sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 		sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		sd.BufferCount = 1;
+		sd.BufferCount = 2;
 		sd.OutputWindow = hWnd;
 		sd.SampleDesc.Count = 1;
 		sd.SampleDesc.Quality = 0;
 		sd.Windowed = TRUE;
-		sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+		sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 		sd.Flags = 0;
 
 		// Create device, front and back buffers, swap chain, and rendering context
@@ -34,7 +34,11 @@ Graphics::Graphics(HWND hWnd)
 		hr = D3D11CreateDeviceAndSwapChain(nullptr,
 			D3D_DRIVER_TYPE_HARDWARE,
 			nullptr,
+#ifdef _DEBUG
+			D3D11_CREATE_DEVICE_DEBUG,
+#else
 			0,
+#endif
 			nullptr,
 			0,
 			D3D11_SDK_VERSION,
@@ -62,6 +66,12 @@ Graphics::Graphics(HWND hWnd)
 
 Graphics::~Graphics()
 {
+#ifdef _DEBUG
+	ID3D11Debug* pDbg = nullptr;
+	HRESULT hr = mDevice->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&pDbg));
+	DbgAssert(S_OK == hr, "Unable to create debug device");
+#endif
+
 	if (mBackBuffer != nullptr)
 	{
 		mBackBuffer->Release();
@@ -78,6 +88,11 @@ Graphics::~Graphics()
 	{
 		mDevice->Release();
 	}
+
+#ifdef _DEBUG
+	pDbg->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL | D3D11_RLDO_IGNORE_INTERNAL);
+	pDbg->Release();
+#endif
 }
 
 void Graphics::ClearBuffer(const Color4& clearColor)
