@@ -1,16 +1,23 @@
 #include "stdafx.h"
 #include "Graphics.h"
+#include <d3dcompiler.h>
+
 #pragma comment (lib, "d3d11.lib") 
+#pragma comment(lib, "D3DCompiler.lib")
 
 Graphics::Graphics(HWND hWnd)
 	: mSwapChain(nullptr)
 	, mDevice(nullptr)
-	, mDevCon(nullptr)
+	, mContext(nullptr)
 	, mBackBuffer(nullptr)
+	, mTriVertexBuffer(nullptr)
+	, mTriangleVertexShader(nullptr)
+	, mBlob(nullptr)
 {
 	HRESULT hr = S_OK;
+	
+	// Setup device and swap chain
 	{
-		// Setup swap chain
 		DXGI_SWAP_CHAIN_DESC sd;
 		ZeroMemory(&sd, sizeof(sd));
 		sd.BufferDesc.Width = 0;
@@ -30,7 +37,6 @@ Graphics::Graphics(HWND hWnd)
 		sd.Flags = 0;
 
 		// Create device, front and back buffers, swap chain, and rendering context
-	
 		hr = D3D11CreateDeviceAndSwapChain(nullptr,
 			D3D_DRIVER_TYPE_HARDWARE,
 			nullptr,
@@ -46,12 +52,13 @@ Graphics::Graphics(HWND hWnd)
 			&mSwapChain,
 			&mDevice,
 			nullptr,
-			&mDevCon);
+			&mContext);
 		DbgAssert(hr == S_OK, "Failed to create device");
 	}
 
 	// Grab the back buffer (access texture subresource in swap chain)
 	{
+		//wrl::ComPtr<ID3D11Resource> pBackBuffer;
 		ID3D11Resource* pBackBuffer;
 		hr = mSwapChain->GetBuffer(0, __uuidof(ID3D11Resource), (LPVOID*)&pBackBuffer);
 		DbgAssert(hr == S_OK, "Something wrong with back buffer");
@@ -62,6 +69,35 @@ Graphics::Graphics(HWND hWnd)
 		pBackBuffer->Release();
 	}
 
+	// Create a vertex buffer
+	{
+		D3D11_BUFFER_DESC bd = {};
+		bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		bd.Usage = D3D11_USAGE_DYNAMIC;
+		bd.ByteWidth = sizeof(vertices);
+		bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		bd.MiscFlags = 0u;
+		bd.StructureByteStride = sizeof(Vertex);
+		D3D11_SUBRESOURCE_DATA sd = {};
+		sd.pSysMem = vertices;
+		
+		hr = mDevice->CreateBuffer(&bd, &sd, &mTriVertexBuffer);
+		DbgAssert(hr == S_OK, "Unable to create vertex buffer");
+	}	
+
+	// Create Vertex Shader
+	{
+		// Read shader file
+		hr = D3DReadFileToBlob(L"VertexShader.cso", &mBlob);
+		DbgAssert(hr == S_OK, "Unable to read shader file");
+
+		// Create Vertex shader
+		hr = mDevice->CreateVertexShader(mBlob->GetBufferPointer(), mBlob->GetBufferSize(), nullptr, &mTriangleVertexShader);
+		DbgAssert(hr == S_OK, "Failed to create vertex shader");
+	
+		// Bind vertex shader
+		mContext->VSSetShader(mTriangleVertexShader, nullptr, 0);
+	}
 }
 
 Graphics::~Graphics()
@@ -76,9 +112,9 @@ Graphics::~Graphics()
 	{
 		mBackBuffer->Release();
 	}
-	if (mDevCon != nullptr) 
+	if (mContext != nullptr) 
 	{
-		mDevCon->Release();
+		mContext->Release();
 	}
 	if (mSwapChain != nullptr)
 	{
@@ -87,6 +123,18 @@ Graphics::~Graphics()
 	if (mDevice != nullptr)
 	{
 		mDevice->Release();
+	}
+	if (mTriVertexBuffer != nullptr)
+	{
+		mTriVertexBuffer->Release();
+	}
+	if (mTriangleVertexShader != nullptr)
+	{
+		mTriangleVertexShader->Release();
+	}
+	if (mBlob != nullptr)
+	{
+		mBlob->Release();
 	}
 
 #ifdef _DEBUG
@@ -97,16 +145,26 @@ Graphics::~Graphics()
 
 void Graphics::ClearBuffer(const Color4& clearColor)
 {
-	mDevCon->ClearRenderTargetView(mBackBuffer, reinterpret_cast<const float*>(&clearColor));
+	mContext->ClearRenderTargetView(mBackBuffer, reinterpret_cast<const float*>(&clearColor));
 }
 
 void Graphics::ClearBuffer(float red, float green, float blue)
 {
 	const float color[] = { red, green, blue, 1.0f };
-	mDevCon->ClearRenderTargetView(mBackBuffer, color);
+	mContext->ClearRenderTargetView(mBackBuffer, color);
 }
 
 void Graphics::EndFrame()
 {
 	mSwapChain->Present(1, 0);
+}
+
+void Graphics::DrawTestTriangle()
+{
+	
+	// Draw
+	const UINT stride = sizeof(Vertex);
+	const UINT offset = 0u;
+	mContext->IASetVertexBuffers(0, 1, &mTriVertexBuffer, &stride, &offset);
+	mContext->Draw(sizeof(vertices) / sizeof(Vertex), 0u);
 }

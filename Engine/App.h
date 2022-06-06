@@ -10,6 +10,8 @@ public:
 	App(const App&) = delete;
 	App& operator=(const App&) = delete;
 
+	void Init();
+
 	// Start game loop
 	int Go();
 private:

@@ -1,5 +1,20 @@
 #pragma once
 #include <d3d11.h>
+#include "wrl.h"
+
+//namespace wrl = Microsoft::WRL;
+
+
+struct Vertex
+{
+	float x, y;
+};
+const Vertex vertices[] =
+{
+	{ 0.0f, 0.5f},
+	{0.5f, -0.5f},
+	{-0.5f, -0.5f}
+};
 
 class Graphics
 {
@@ -25,10 +40,18 @@ public:
 	void ClearBuffer(float red, float green, float blue);
 	void EndFrame();
 
+	void DrawTestTriangle();
+
 private:
+	// TEST TRIANGLE STUFF---------------------
+	ID3D11Buffer* mTriVertexBuffer;
+	ID3D11VertexShader* mTriangleVertexShader;
+	ID3DBlob* mBlob;
+
+	// Normal stuff
 	IDXGISwapChain* mSwapChain;
 	ID3D11Device* mDevice;
-	ID3D11DeviceContext* mDevCon;
+	ID3D11DeviceContext* mContext;
 	
 	ID3D11RenderTargetView* mBackBuffer;
 };
