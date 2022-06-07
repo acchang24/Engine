@@ -102,12 +102,12 @@ int App::Go()
 
 
 			time += deltaTime;
-			std::ostringstream oss;
+			/*std::ostringstream oss;
 			oss << "Time Elapsed: " << std::setprecision(3) << std::fixed << time << "s";
 			std::string str = oss.str();
 			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 			std::wstring ws = converter.from_bytes(str);
-			wnd.SetTitle(ws);
+			wnd.SetTitle(ws);*/
 
 			RenderFrame();
 		}

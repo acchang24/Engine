@@ -79,6 +79,9 @@
     <ClInclude Include="Engine\Graphics.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\VertexFormats.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Engine\Engine.rc">

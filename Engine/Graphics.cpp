@@ -3,22 +3,18 @@
 #include <d3dcompiler.h>
 
 #pragma comment (lib, "d3d11.lib") 
-#pragma comment(lib, "D3DCompiler.lib")
+#pragma comment(lib, "d3dCompiler.lib")
 
 
-struct Vertex
-{
-	float x, y;
-	Graphics::Color4 color;
-};
+
 const Vertex vertices[] =
 {
-	{ 0.0f, 0.5f, Graphics::Color4(1.0f, 0.0f, 0.0f, 1.0f)},
-	{0.5f, -0.5f, Graphics::Color4(0.0f, 1.0f, 0.0f, 1.0f)},
-	{-0.5f, -0.5f, Graphics::Color4(0.0f, 0.0f, 1.0f, 1.0f)},
-	{-0.3f, 0.3f, Graphics::Color4(0.0f, 1.0f, 0.0f, 1.0f)},
-	{0.3f, 0.3f, Graphics::Color4(0.0f, 0.0f, 1.0f, 1.0f)},
-	{ 0.0f, -0.8f, Graphics::Color4(1.0f, 0.0f, 0.0f, 1.0f)},
+	{ 0.0f, 0.5f, Color4(1.0f, 0.0f, 0.0f, 1.0f)},
+	{0.5f, -0.5f, Color4(0.0f, 1.0f, 0.0f, 1.0f)},
+	{-0.5f, -0.5f, Color4(0.0f, 0.0f, 1.0f, 1.0f)},
+	{-0.3f, 0.3f, Color4(0.0f, 1.0f, 0.0f, 1.0f)},
+	{0.3f, 0.3f, Color4(0.0f, 0.0f, 1.0f, 1.0f)},
+	{ 0.0f, -0.8f, Color4(1.0f, 0.0f, 0.0f, 1.0f)},
 };
 
 const uint16_t indices[] =
@@ -115,9 +111,44 @@ Graphics::Graphics(HWND hWnd)
 
 	// Create Vertex Shader
 	{
+		DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
+
+#ifdef _DEBUG
+		// Set the D3DCOMPILE_DEBUG flag to embed debug information in the shaders.
+		// Setting this flag improves the shader debugging experience, but still allows 
+		// the shaders to be optimized and to run exactly the way they will run in 
+		// the release configuration of this program.
+		dwShaderFlags |= D3DCOMPILE_DEBUG;
+
+		// Disable optimizations to further improve shader debugging
+		dwShaderFlags |= D3DCOMPILE_SKIP_OPTIMIZATION;
+#endif
 		// Read shader file
-		hr = D3DReadFileToBlob(L"VertexShader.cso", &mVSBlob);
-		DbgAssert(hr == S_OK, "Unable to read vertex shader file");
+		ID3DBlob* pErrorBlob = nullptr;
+		hr = D3DCompileFromFile(L"Engine/Shaders/VertexShader.hlsl", nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", "vs_4_0",
+			dwShaderFlags, 0, &mVSBlob, &pErrorBlob);
+
+		if (FAILED(hr))
+		{
+			if (pErrorBlob)
+			{
+				static wchar_t szBuffer[4096];
+				_snwprintf_s(szBuffer, 4096, _TRUNCATE,
+					L"%hs",
+					(char*)pErrorBlob->GetBufferPointer());
+				OutputDebugString(szBuffer);
+#ifdef _WINDOWS
+				MessageBox(nullptr, szBuffer, L"Error", MB_OK);
+#endif
+				pErrorBlob->Release();
+			}
+		}
+		if (pErrorBlob)
+		{
+			pErrorBlob->Release();
+		}
+		//hr = D3DReadFileToBlob(L"VertexShader.cso", &mVSBlob);
+		//DbgAssert(hr == S_OK, "Unable to read vertex shader file");
 
 		// Create Vertex shader
 		hr = mDevice->CreateVertexShader(mVSBlob->GetBufferPointer(), mVSBlob->GetBufferSize(), nullptr, &mTriangleVertexShader);
@@ -129,8 +160,44 @@ Graphics::Graphics(HWND hWnd)
 
 	// Create Pixel Shader
 	{
-		hr = D3DReadFileToBlob(L"PixelShader.cso", &mPSBlob);
-		DbgAssert(hr == S_OK, "Unable to read pixel shader file");
+		DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
+
+#ifdef _DEBUG
+		// Set the D3DCOMPILE_DEBUG flag to embed debug information in the shaders.
+		// Setting this flag improves the shader debugging experience, but still allows 
+		// the shaders to be optimized and to run exactly the way they will run in 
+		// the release configuration of this program.
+		dwShaderFlags |= D3DCOMPILE_DEBUG;
+
+		// Disable optimizations to further improve shader debugging
+		dwShaderFlags |= D3DCOMPILE_SKIP_OPTIMIZATION;
+#endif
+		// Read shader file
+		ID3DBlob* pErrorBlob = nullptr;
+		hr = D3DCompileFromFile(L"Engine/Shaders/PixelShader.hlsl", nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", "ps_4_0",
+			dwShaderFlags, 0, &mPSBlob, &pErrorBlob);
+
+		if (FAILED(hr))
+		{
+			if (pErrorBlob)
+			{
+				static wchar_t szBuffer[4096];
+				_snwprintf_s(szBuffer, 4096, _TRUNCATE,
+					L"%hs",
+					(char*)pErrorBlob->GetBufferPointer());
+				OutputDebugString(szBuffer);
+#ifdef _WINDOWS
+				MessageBox(nullptr, szBuffer, L"Error", MB_OK);
+#endif
+				pErrorBlob->Release();
+			}
+		}
+		if (pErrorBlob)
+		{
+			pErrorBlob->Release();
+		}
+		//hr = D3DReadFileToBlob(L"PixelShader.cso", &mPSBlob);
+		//DbgAssert(hr == S_OK, "Unable to read pixel shader file");
 
 		hr = mDevice->CreatePixelShader(mPSBlob->GetBufferPointer(), mPSBlob->GetBufferSize(), nullptr, &mTrianglePixelShader);
 		DbgAssert(hr == S_OK, "Failed to create vertex shader");
@@ -142,7 +209,7 @@ Graphics::Graphics(HWND hWnd)
 	{
 		const D3D11_INPUT_ELEMENT_DESC ied[] =
 		{
-			{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 			{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		};
 		hr = mDevice->CreateInputLayout(ied, sizeof(ied) / sizeof(D3D11_INPUT_ELEMENT_DESC), mVSBlob->GetBufferPointer(), mVSBlob->GetBufferSize(), &mInputLayout);
