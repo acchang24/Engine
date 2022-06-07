@@ -5,6 +5,30 @@
 #pragma comment (lib, "d3d11.lib") 
 #pragma comment(lib, "D3DCompiler.lib")
 
+
+struct Vertex
+{
+	float x, y;
+	Graphics::Color4 color;
+};
+const Vertex vertices[] =
+{
+	{ 0.0f, 0.5f, Graphics::Color4(1.0f, 0.0f, 0.0f, 1.0f)},
+	{0.5f, -0.5f, Graphics::Color4(0.0f, 1.0f, 0.0f, 1.0f)},
+	{-0.5f, -0.5f, Graphics::Color4(0.0f, 0.0f, 1.0f, 1.0f)},
+	{-0.3f, 0.3f, Graphics::Color4(0.0f, 1.0f, 0.0f, 1.0f)},
+	{0.3f, 0.3f, Graphics::Color4(0.0f, 0.0f, 1.0f, 1.0f)},
+	{ 0.0f, -0.8f, Graphics::Color4(1.0f, 0.0f, 0.0f, 1.0f)},
+};
+
+const uint16_t indices[] =
+{
+	0, 1, 2,
+	0, 2, 3,
+	0, 4, 1,
+	2, 1, 5,
+};
+
 Graphics::Graphics(HWND hWnd)
 	: mSwapChain(nullptr)
 	, mDevice(nullptr)
@@ -16,9 +40,10 @@ Graphics::Graphics(HWND hWnd)
 	, mVSBlob(nullptr)
 	, mPSBlob(nullptr)
 	, mInputLayout(nullptr)
+	, mIndexBuffer(nullptr)
 {
 	HRESULT hr = S_OK;
-	
+
 	// Setup device and swap chain
 	{
 		DXGI_SWAP_CHAIN_DESC sd;
@@ -83,10 +108,10 @@ Graphics::Graphics(HWND hWnd)
 		bd.StructureByteStride = sizeof(Vertex);
 		D3D11_SUBRESOURCE_DATA sd = {};
 		sd.pSysMem = vertices;
-		
+
 		hr = mDevice->CreateBuffer(&bd, &sd, &mTriVertexBuffer);
 		DbgAssert(hr == S_OK, "Unable to create vertex buffer");
-	}	
+	}
 
 	// Create Vertex Shader
 	{
@@ -97,7 +122,7 @@ Graphics::Graphics(HWND hWnd)
 		// Create Vertex shader
 		hr = mDevice->CreateVertexShader(mVSBlob->GetBufferPointer(), mVSBlob->GetBufferSize(), nullptr, &mTriangleVertexShader);
 		DbgAssert(hr == S_OK, "Failed to create vertex shader");
-	
+
 		// Bind vertex shader
 		mContext->VSSetShader(mTriangleVertexShader, nullptr, 0);
 	}
@@ -118,12 +143,32 @@ Graphics::Graphics(HWND hWnd)
 		const D3D11_INPUT_ELEMENT_DESC ied[] =
 		{
 			{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		};
-		hr = mDevice->CreateInputLayout(ied, sizeof(ied)/sizeof(D3D11_INPUT_ELEMENT_DESC), mVSBlob->GetBufferPointer(), mVSBlob->GetBufferSize(), &mInputLayout);
+		hr = mDevice->CreateInputLayout(ied, sizeof(ied) / sizeof(D3D11_INPUT_ELEMENT_DESC), mVSBlob->GetBufferPointer(), mVSBlob->GetBufferSize(), &mInputLayout);
 		DbgAssert(hr == S_OK, "Failed to create input layout");
 
 		// Bind input layout
 		mContext->IASetInputLayout(mInputLayout);
+	}
+
+	// Create a index buffer
+	{
+		D3D11_BUFFER_DESC ibd = {};
+		ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		ibd.Usage = D3D11_USAGE_DYNAMIC;
+		ibd.ByteWidth = sizeof(indices);
+		ibd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		ibd.MiscFlags = 0u;
+		ibd.StructureByteStride = sizeof(uint16_t);
+		D3D11_SUBRESOURCE_DATA isd = {};
+		isd.pSysMem = indices;
+
+		hr = mDevice->CreateBuffer(&ibd, &isd, &mIndexBuffer);
+		DbgAssert(hr == S_OK, "Unable to create index buffer");
+
+		// Bind index buffer
+		mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, 0u);
 	}
 
 	
@@ -180,6 +225,10 @@ Graphics::~Graphics()
 	{
 		mInputLayout->Release();
 	}
+	if (mIndexBuffer != nullptr)
+	{
+		mIndexBuffer->Release();
+	}
 
 #ifdef _DEBUG
 	pDbg->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL | D3D11_RLDO_IGNORE_INTERNAL);
@@ -225,5 +274,7 @@ void Graphics::DrawTestTriangle()
 	const UINT stride = sizeof(Vertex);
 	const UINT offset = 0u;
 	mContext->IASetVertexBuffers(0, 1, &mTriVertexBuffer, &stride, &offset);
-	mContext->Draw(sizeof(vertices) / sizeof(Vertex), 0u);
+
+	mContext->DrawIndexed(sizeof(indices) / sizeof(uint16_t), 0u, 0u);
+	//mContext->Draw(sizeof(vertices) / sizeof(Vertex), 0u);
 }

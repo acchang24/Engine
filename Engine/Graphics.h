@@ -5,17 +5,6 @@
 //namespace wrl = Microsoft::WRL;
 
 
-struct Vertex
-{
-	float x, y;
-};
-const Vertex vertices[] =
-{
-	{ 0.0f, 0.5f},
-	{0.5f, -0.5f},
-	{-0.5f, -0.5f}
-};
-
 class Graphics
 {
 public:
@@ -50,6 +39,7 @@ private:
 	ID3DBlob* mVSBlob;
 	ID3DBlob* mPSBlob;
 	ID3D11InputLayout* mInputLayout;
+	ID3D11Buffer* mIndexBuffer;
 
 	// Normal stuff
 	IDXGISwapChain* mSwapChain;
