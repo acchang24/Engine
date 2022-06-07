@@ -46,7 +46,10 @@ private:
 	// TEST TRIANGLE STUFF---------------------
 	ID3D11Buffer* mTriVertexBuffer;
 	ID3D11VertexShader* mTriangleVertexShader;
-	ID3DBlob* mBlob;
+	ID3D11PixelShader* mTrianglePixelShader;
+	ID3DBlob* mVSBlob;
+	ID3DBlob* mPSBlob;
+	ID3D11InputLayout* mInputLayout;
 
 	// Normal stuff
 	IDXGISwapChain* mSwapChain;

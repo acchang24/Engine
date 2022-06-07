@@ -12,7 +12,10 @@ Graphics::Graphics(HWND hWnd)
 	, mBackBuffer(nullptr)
 	, mTriVertexBuffer(nullptr)
 	, mTriangleVertexShader(nullptr)
-	, mBlob(nullptr)
+	, mTrianglePixelShader(nullptr)
+	, mVSBlob(nullptr)
+	, mPSBlob(nullptr)
+	, mInputLayout(nullptr)
 {
 	HRESULT hr = S_OK;
 	
@@ -88,16 +91,45 @@ Graphics::Graphics(HWND hWnd)
 	// Create Vertex Shader
 	{
 		// Read shader file
-		hr = D3DReadFileToBlob(L"VertexShader.cso", &mBlob);
-		DbgAssert(hr == S_OK, "Unable to read shader file");
+		hr = D3DReadFileToBlob(L"VertexShader.cso", &mVSBlob);
+		DbgAssert(hr == S_OK, "Unable to read vertex shader file");
 
 		// Create Vertex shader
-		hr = mDevice->CreateVertexShader(mBlob->GetBufferPointer(), mBlob->GetBufferSize(), nullptr, &mTriangleVertexShader);
+		hr = mDevice->CreateVertexShader(mVSBlob->GetBufferPointer(), mVSBlob->GetBufferSize(), nullptr, &mTriangleVertexShader);
 		DbgAssert(hr == S_OK, "Failed to create vertex shader");
 	
 		// Bind vertex shader
 		mContext->VSSetShader(mTriangleVertexShader, nullptr, 0);
 	}
+
+	// Create Pixel Shader
+	{
+		hr = D3DReadFileToBlob(L"PixelShader.cso", &mPSBlob);
+		DbgAssert(hr == S_OK, "Unable to read pixel shader file");
+
+		hr = mDevice->CreatePixelShader(mPSBlob->GetBufferPointer(), mPSBlob->GetBufferSize(), nullptr, &mTrianglePixelShader);
+		DbgAssert(hr == S_OK, "Failed to create vertex shader");
+
+		mContext->PSSetShader(mTrianglePixelShader, nullptr, 0);
+	}
+
+	// Create Input Layout
+	{
+		const D3D11_INPUT_ELEMENT_DESC ied[] =
+		{
+			{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		};
+		hr = mDevice->CreateInputLayout(ied, sizeof(ied)/sizeof(D3D11_INPUT_ELEMENT_DESC), mVSBlob->GetBufferPointer(), mVSBlob->GetBufferSize(), &mInputLayout);
+		DbgAssert(hr == S_OK, "Failed to create input layout");
+
+		// Bind input layout
+		mContext->IASetInputLayout(mInputLayout);
+	}
+
+	
+
+	// Draw triangle lists(groups of 3 vertices)
+	mContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 Graphics::~Graphics()
@@ -112,7 +144,7 @@ Graphics::~Graphics()
 	{
 		mBackBuffer->Release();
 	}
-	if (mContext != nullptr) 
+	if (mContext != nullptr)
 	{
 		mContext->Release();
 	}
@@ -132,9 +164,21 @@ Graphics::~Graphics()
 	{
 		mTriangleVertexShader->Release();
 	}
-	if (mBlob != nullptr)
+	if (mTrianglePixelShader != nullptr)
 	{
-		mBlob->Release();
+		mTrianglePixelShader->Release();
+	}
+	if (mVSBlob != nullptr)
+	{
+		mVSBlob->Release();
+	}
+	if (mPSBlob != nullptr)
+	{
+		mPSBlob->Release();
+	}
+	if (mInputLayout != nullptr)
+	{
+		mInputLayout->Release();
 	}
 
 #ifdef _DEBUG
@@ -162,6 +206,21 @@ void Graphics::EndFrame()
 void Graphics::DrawTestTriangle()
 {
 	
+	// Bind render target
+	mContext->OMSetRenderTargets(1u, &mBackBuffer, nullptr);
+
+
+	// Set Viewport
+	D3D11_VIEWPORT vp = {};
+	vp.Width = 800;
+	vp.Height = 600;
+	vp.MinDepth = 0;
+	vp.MaxDepth = 1;
+	vp.TopLeftX = 0;
+	vp.TopLeftY = 0;
+	mContext->RSSetViewports(1, &vp);
+
+
 	// Draw
 	const UINT stride = sizeof(Vertex);
 	const UINT offset = 0u;
