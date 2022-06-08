@@ -13,8 +13,3 @@ VSOut main(float2 pos : POSITION, float4 color : COLOR)
 
 	return output;
 }
-
-//float4 main( float2 pos : POSITION, float3 color : COLOR ) : SV_POSITION
-//{
-//	return float4(pos.x, pos.y, 0.0f, 1.0f);
-//}

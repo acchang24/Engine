@@ -22,7 +22,7 @@ void App::Init()
 
 int App::Go()
 {
-	MSG msg;
+	MSG msg = {};
 
 	float time = 0.0f;/////////////////////
 

@@ -168,9 +168,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Engine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Engine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Engine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Engine</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Engine\Window.cpp" />
     <ClCompile Include="Engine\WindowException.cpp" />
+    <ClCompile Include="Engine\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\App.h" />
@@ -185,6 +190,7 @@
     <ClInclude Include="Engine\Window.h" />
     <ClInclude Include="Engine\WindowException.h" />
     <ClInclude Include="Engine\VertexFormats.h" />
+    <ClInclude Include="Engine\Shader.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Engine\Engine.rc" />
