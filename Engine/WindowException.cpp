@@ -27,7 +27,7 @@ std::string WindowException::TranslateErrorCode(HRESULT result)
 {
 	LPWSTR pMsgBuf = nullptr;
 	// windows will allocate memory for err string and make our pointer point to it
-	const DWORD nMsgLen = FormatMessage(
+	const DWORD nMsgLen = FormatMessageW(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER |
 		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 		nullptr, result, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),

@@ -3,7 +3,6 @@
 #include <intrin.h>
 
 #ifdef _DEBUG
-#ifdef _WINDOWS
 extern bool DbgAssertFunction(bool expr, const wchar_t* expr_string, const wchar_t* desc, int line_num, const wchar_t* file_name);
 
 // These macros convert __FILE__ from char* to wchar_t*
@@ -12,10 +11,6 @@ extern bool DbgAssertFunction(bool expr, const wchar_t* expr_string, const wchar
 #define __WFILE__ DBG_WIDEN(__FILE__)
 
 #define DbgAssert(expr, description) {if (DbgAssertFunction((expr), L#expr, L##description, __LINE__, __WFILE__)) {__debugbreak();}}
-#else
-#include <assert.h>
-#define DbgAssert(expr, description) {assert(expr);}
-#endif
 #else
 #define DbgAssert(expr, description)
 #endif // _DEBUG

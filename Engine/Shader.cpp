@@ -58,7 +58,7 @@ static bool LoadShader(const WCHAR* filename, const char* entryPoint, const char
             _snwprintf_s(szBuffer, 4096, _TRUNCATE,
                 L"%hs",
                 (char*)pErrorBlob->GetBufferPointer());
-            OutputDebugString(szBuffer);
+            OutputDebugStringW(szBuffer);
 #ifdef _WINDOWS
             MessageBox(nullptr, szBuffer, L"Error", MB_OK);
 #endif
@@ -99,6 +99,7 @@ bool Shader::Load(const WCHAR* fileName, ShaderType type, const D3D11_INPUT_ELEM
         if (S_OK == hr)
             return true;
     }
+    hr = S_FALSE;
     DbgAssert(hr == S_OK, "Could not load the shader file");
     return false;
 }

@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#ifdef _WINDOWS
 
 // Implements custom assert handler
 #include <cstdlib>
@@ -13,7 +12,7 @@ bool DbgAssertFunction(bool expr, const wchar_t* expr_string, const wchar_t* des
 		_snwprintf_s(szBuffer, 1024, _TRUNCATE, 
 					L"Assertion Failed!\n\nDescription: %s\nExpression: %s\nFile: %s\nLine: %d\n\nPress Retry to debug.",
 					desc, expr_string, file_name, line_num);
-		int msgbox = MessageBox(NULL, szBuffer, L"Assert", MB_ICONERROR | MB_ABORTRETRYIGNORE | MB_DEFBUTTON2);
+		int msgbox = MessageBoxW(NULL, szBuffer, L"Assert", MB_ICONERROR | MB_ABORTRETRYIGNORE | MB_DEFBUTTON2);
 		switch (msgbox)
 		{
 			case IDABORT:
@@ -30,5 +29,3 @@ bool DbgAssertFunction(bool expr, const wchar_t* expr_string, const wchar_t* des
 
 	return bShouldHalt;
 }
-
-#endif

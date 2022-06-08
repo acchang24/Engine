@@ -22,11 +22,11 @@ int APIENTRY wWinMain(
 	}
 	catch (const Exception& e)
 	{
-		MessageBox(nullptr, e.What().c_str(), e.GetType(), MB_OK | MB_ICONEXCLAMATION);
+		MessageBoxW(nullptr, e.What().c_str(), e.GetType(), MB_OK | MB_ICONEXCLAMATION);
 	}
 	catch (...)
 	{
-		MessageBox(nullptr, L"No details available", L"Unknown Exception", MB_OK | MB_ICONEXCLAMATION);
+		MessageBoxW(nullptr, L"No details available", L"Unknown Exception", MB_OK | MB_ICONEXCLAMATION);
 	}
 	return -1;
 }

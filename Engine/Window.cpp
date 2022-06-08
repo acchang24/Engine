@@ -10,7 +10,7 @@ Window::WindowClass::WindowClass()
 	: hInst(GetModuleHandle(nullptr)) // GetModuleHandle to save instance
 {
 	// Register a window class
-	WNDCLASSEX wc;
+	WNDCLASSEXW wc;
 	ZeroMemory(&wc, sizeof(WNDCLASSEX));
 	wc.cbSize = sizeof(WNDCLASSEX);
 	wc.style = CS_OWNDC;
@@ -25,13 +25,13 @@ Window::WindowClass::WindowClass()
 	wc.lpszClassName = GetName();
 	wc.hIconSm = static_cast<HICON>(LoadImage(hInst, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 16, 16, 0));
 
-	RegisterClassEx(&wc);
+	RegisterClassExW(&wc);
 }
 
 Window::WindowClass::~WindowClass()
 {
 	// Unregister the window class
-	UnregisterClass(wndClassName, GetInstance());
+	UnregisterClassW(wndClassName, GetInstance());
 }
 
 const wchar_t* Window::WindowClass::GetName()
@@ -66,7 +66,7 @@ Window::Window(int width, int height, const wchar_t* name)
 	}
 
 	// Create window and get hWnd
-	hWnd = CreateWindowEx(
+	hWnd = CreateWindowExW(
 		0,
 		WindowClass::GetName(),
 		name,
@@ -94,12 +94,12 @@ Window::~Window()
 	delete mKeyboard;
 	delete mMouse;
 	// Destroys window
-	DestroyWindow(hWnd);
+	//DestroyWindow(hWnd);
 }
 
 void Window::SetTitle(const std::wstring& title)
 {
-	if (SetWindowText(hWnd, title.c_str()) == FALSE)
+	if (SetWindowTextW(hWnd, title.c_str()) == FALSE)
 	{
 		throw WND_LAST_EXCEPT();
 	}
@@ -135,6 +135,7 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		// Post quit message when user exits program
 		case WM_CLOSE:
+			DestroyWindow(hWnd);
 			PostQuitMessage(0);
 			return 0;
 		// Clear keystate when the window loses focus to prevent zombie inputs
