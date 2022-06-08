@@ -2,6 +2,7 @@
 #include <d3dcompiler.h>
 #include "Graphics.h"
 #include "Shader.h"
+#include <cmath>
 
 
 #pragma comment (lib, "d3d11.lib") 
@@ -16,7 +17,7 @@ const Vertex vertices[] =
 	{-0.5f, -0.5f, Color4(0.0f, 0.0f, 1.0f, 1.0f)},
 	{-0.3f, 0.3f, Color4(0.0f, 1.0f, 0.0f, 1.0f)},
 	{0.3f, 0.3f, Color4(0.0f, 0.0f, 1.0f, 1.0f)},
-	{ 0.0f, -0.8f, Color4(1.0f, 0.0f, 0.0f, 1.0f)},
+	{ 0.0f, -1.0f, Color4(1.0f, 0.0f, 0.0f, 1.0f)},
 };
 
 const uint16_t indices[] =
@@ -34,7 +35,17 @@ Graphics::Graphics(HWND hWnd)
 	, mBackBuffer(nullptr)
 	, mTriVertexBuffer(nullptr)
 	, mIndexBuffer(nullptr)
+	, mShader(nullptr)
+	, mConstBuffer(nullptr)
 {
+	cb =
+	{
+		std::cos(angle), std::sin(angle), 0.0f, 0.0f,
+		-std::sin(angle), std::cos(angle), 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+	};
+
 	HRESULT hr = S_OK;
 
 	// Setup device and swap chain
@@ -109,6 +120,9 @@ Graphics::Graphics(HWND hWnd)
 	// Create a index buffer
 	mIndexBuffer = CreateGraphicsBuffer(indices, sizeof(indices), sizeof(uint16_t), D3D11_BIND_INDEX_BUFFER, D3D11_CPU_ACCESS_WRITE, D3D11_USAGE_DYNAMIC);
 
+	// Create const buffer
+	mConstBuffer = CreateGraphicsBuffer(&cb, sizeof(cb), 0, D3D11_BIND_CONSTANT_BUFFER, D3D11_CPU_ACCESS_WRITE, D3D11_USAGE_DYNAMIC);
+
 	// Draw triangle lists(groups of 3 vertices)
 	mContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
@@ -148,6 +162,10 @@ Graphics::~Graphics()
 	if (mShader != nullptr)
 	{
 		delete mShader;
+	}
+	if (mConstBuffer != nullptr)
+	{
+		mConstBuffer->Release();
 	}
 
 #ifdef _DEBUG
@@ -192,7 +210,22 @@ ID3D11Buffer* Graphics::CreateGraphicsBuffer(const void* initData, UINT byteWidt
 	HRESULT hr = mDevice->CreateBuffer(&bd, &sd, &buffer);
 	DbgAssert(hr == S_OK, "Unable to create a graphics buffer");
 
+	if (initData != nullptr)
+	{
+		// upload buffer info to gpu
+		UploadBuffer(buffer, initData, byteWidth);
+	}
+
 	return buffer;
+}
+
+void Graphics::UploadBuffer(ID3D11Buffer* buffer, const void* data, UINT dataSize)
+{
+	D3D11_MAPPED_SUBRESOURCE map;
+	HRESULT hr = mContext->Map(buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &map);
+	DbgAssert(hr == S_OK, "Map failed");
+	memcpy(map.pData, data, dataSize);
+	mContext->Unmap(buffer, 0);
 }
 
 void Graphics::SetViewport(float x, float y, float width, float height)
@@ -210,11 +243,25 @@ void Graphics::SetViewport(float x, float y, float width, float height)
 
 void Graphics::DrawTestTriangle()
 {
+	angle = time.Peek();
+	cb =
+	{
+		(3.0f/4.0f)*std::cos(angle), std::sin(angle), 0.0f, 0.0f,
+		(3.0f/4.0f)*-std::sin(angle), std::cos(angle), 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+	};
+	// Update object buffer
+	UploadBuffer(mConstBuffer, &cb, sizeof(cb));
+
 	// Bind render target
 	mContext->OMSetRenderTargets(1u, &mBackBuffer, nullptr);
 
 	// Set the viewport
 	SetViewport(0.0f, 0.0f, 800.0f, 600.0f);
+
+	// bind constant buffer to vertex shader
+	mContext->VSSetConstantBuffers(0, 1, &mConstBuffer);
 
 	// Draw
 	const UINT stride = sizeof(Vertex);
