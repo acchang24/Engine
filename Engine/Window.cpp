@@ -93,11 +93,10 @@ Window::Window(int width, int height, const wchar_t* name)
 
 Window::~Window()
 {
+	DestroyWindow(hWnd);
 	delete mKeyboard;
 	delete mMouse;
 	delete mGraphics;
-	// Destroys window
-	//DestroyWindow(hWnd);
 }
 
 void Window::SetTitle(const std::wstring& title)
@@ -138,7 +137,6 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		// Post quit message when user exits program
 		case WM_CLOSE:
-			DestroyWindow(hWnd);
 			PostQuitMessage(0);
 			return 0;
 		// Clear keystate when the window loses focus to prevent zombie inputs

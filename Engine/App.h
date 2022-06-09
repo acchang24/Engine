@@ -19,6 +19,6 @@ private:
 	void RenderFrame();
 
 	bool running;
-	Window wnd;
+	Window* wnd;
 	LoopTimer timer;
 };

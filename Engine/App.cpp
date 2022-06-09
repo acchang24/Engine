@@ -6,8 +6,9 @@
 #define WINWIDTH 800
 #define WINHEIGHT 600
 
-App::App() : wnd(WINWIDTH, WINHEIGHT, L"Engine")
+App::App()
 {
+	wnd = new Window(WINWIDTH, WINHEIGHT, L"Engine");
 	running = true;
 }
 
@@ -28,9 +29,10 @@ void App::ShutDown()
 
 int App::Run()
 {
-	MSG msg = {};
+	// Initialize everything
+	Init();
 
-	float time = 0.0f;/////////////////////
+	MSG msg = {};
 
 	// Get the current time
 	std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
@@ -118,12 +120,15 @@ int App::Run()
 			RenderFrame();
 		}
 	}
+
+	delete wnd;
+
 	return (int)msg.wParam;
 }
 
 void App::RenderFrame()
 {
-	Graphics* g = wnd.GetGraphics();
+	Graphics* g = wnd->GetGraphics();
 
 	const float c = sin(timer.Peek()) / 2.0f + 0.5f;
 	
@@ -136,7 +141,7 @@ void App::RenderFrame()
 
 	g->DrawTestTriangle(0.0f, 0.0f, 1.0f);
 
-	g->DrawTestTriangle(wnd.mMouse->GetPosX() / 400.0f - 1.0f, -wnd.mMouse->GetPosY() / 300.0f + 1.0f, -1.0f);
+	g->DrawTestTriangle(wnd->mMouse->GetPosX() / 400.0f - 1.0f, -wnd->mMouse->GetPosY() / 300.0f + 1.0f, -1.0f);
 
 	g->EndFrame();
 }
