@@ -9,8 +9,9 @@ public:
 	VertexBuffer(
 		const void* vertexData, UINT sizeOfVertices, UINT vertexStride,
 		const void* indexData, UINT sizeOfIndices, UINT indexStride);
-
 	~VertexBuffer();
+	VertexBuffer(const VertexBuffer&) = delete;
+	VertexBuffer& operator=(const VertexBuffer&) = delete;
 
 	void Draw() const;
 

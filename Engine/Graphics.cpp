@@ -3,6 +3,7 @@
 #include <cmath>
 #include "Graphics.h"
 #include "Shader.h"
+#include "RenderObj.h"
 #include "VertexBuffer.h"
 
 
@@ -67,13 +68,12 @@ Graphics::Graphics()
 	, mContext(nullptr)
 	, mBackBuffer(nullptr)
 	, mShader(nullptr)
-	, mConstBuffer(nullptr)
 	, mConstColorBuffer(nullptr)
 	, mCubeShader(nullptr)
 	, mDepthTexture(nullptr)
 	, mDepthStencilView(nullptr)
 	, mCurrentRenderTarget(nullptr)
-	, vBuffer(nullptr)
+	, testCube(nullptr)
 	, screenWidth(0.0f)
 	, screenHeight(0.0f)
 {
@@ -109,10 +109,6 @@ Graphics::~Graphics()
 	{
 		delete mShader;
 	}
-	if (mConstBuffer)
-	{
-		mConstBuffer->Release();
-	}
 	if (mConstColorBuffer)
 	{
 		mConstColorBuffer->Release();
@@ -129,9 +125,9 @@ Graphics::~Graphics()
 	{
 		mDepthTexture->Release();
 	}
-	if (vBuffer)
+	if (testCube)
 	{
-		delete vBuffer;
+		delete testCube;
 	}
 
 #ifdef _DEBUG
@@ -202,9 +198,8 @@ void Graphics::InitD3D(HWND hWnd, float width, float height)
 	// Draw triangle lists(groups of 3 vertices)
 	mContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	// Create a VertexBuffer
-	vBuffer = new VertexBuffer(vertices, sizeof(vertices), sizeof(Vertex), indices, sizeof(indices), sizeof(uint16_t));
-
+	// Create a render obj
+	testCube = new RenderObj(new VertexBuffer(vertices, sizeof(vertices), sizeof(Vertex), indices, sizeof(indices), sizeof(uint16_t)));
 	
 	// Shader
 	mShader = new Shader(this);
@@ -246,13 +241,8 @@ void Graphics::InitD3D(HWND hWnd, float width, float height)
 		CreateDepthStencil((int)width, (int)height, &mDepthTexture, &mDepthStencilView);
 	}
 
-
-	// Create const buffer
-	mConstBuffer = CreateGraphicsBuffer(&cb, sizeof(cb), 0, D3D11_BIND_CONSTANT_BUFFER, D3D11_CPU_ACCESS_WRITE, D3D11_USAGE_DYNAMIC);
-
 	// Create the const color buffer
 	mConstColorBuffer = CreateGraphicsBuffer(&cb2, sizeof(cb2), 0, D3D11_BIND_CONSTANT_BUFFER, D3D11_CPU_ACCESS_WRITE, D3D11_USAGE_DYNAMIC);
-
 }
 
 
@@ -415,17 +405,10 @@ void Graphics::DrawTestTriangle(float x, float y, float z, float dir)
 		* Matrix4::CreateTranslation(Vector3(x, y, z + 4.0f))
 		* Matrix4::CreatePerspectiveFOV(Math::ToRadians(90.0f), 1.0f, 3.0f/4.0f, 1.0f, 10000.0f);
 	transform.Transpose();
-	cb.modelToWorld = transform;
-	
-
-	// Update object buffer
-	UploadBuffer(mConstBuffer, &cb, sizeof(cb));
-
-	// bind constant buffer to vertex shader
-	mContext->VSSetConstantBuffers(0, 1, &mConstBuffer);
+	testCube->mObjConsts.modelToWorld = transform;
 
 	// bind constant color buffer to pixel shader
 	mContext->PSSetConstantBuffers(0, 1, &mConstColorBuffer);
 
-	vBuffer->Draw();
+	testCube->Draw();
 }

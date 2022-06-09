@@ -4,7 +4,7 @@
 #include "LoopTimer.h"
 #include "EngineMath.h"
 
-class VertexBuffer;
+class RenderObj;
 
 struct ConstBuffer
 {
@@ -70,21 +70,14 @@ private:
 	static Graphics* sGraphics;
 
 	// TEST TRIANGLE STUFF---------------------
-	VertexBuffer* vBuffer;
+	RenderObj* testCube;
 
-	ID3D11Buffer* mConstBuffer;
 	ID3D11Buffer* mConstColorBuffer;
 
 	float screenWidth;
 	float screenHeight;
 
-	// Z-buffer
-	ID3D11Texture2D* mDepthTexture;
-	ID3D11DepthStencilView* mDepthStencilView;
-
-
 	float angle = 0.0f;
-	ConstBuffer cb;
 
 	// Normal stuff
 	IDXGISwapChain* mSwapChain;
@@ -93,6 +86,10 @@ private:
 	
 	ID3D11RenderTargetView* mBackBuffer;
 	ID3D11RenderTargetView* mCurrentRenderTarget;
+
+	// Z-buffer
+	ID3D11Texture2D* mDepthTexture;
+	ID3D11DepthStencilView* mDepthStencilView;
 
 	LoopTimer time;
 };
