@@ -47,7 +47,7 @@
     <ClCompile Include="Engine\Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Math.cpp">
+    <ClCompile Include="Engine\EngineMath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -91,7 +91,7 @@
     <ClInclude Include="Engine\Shader.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Math.h">
+    <ClInclude Include="Engine\EngineMath.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

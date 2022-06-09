@@ -37,14 +37,6 @@ Graphics::Graphics(HWND hWnd)
 	, mShader(nullptr)
 	, mConstBuffer(nullptr)
 {
-	cb =
-	{
-		std::cos(angle), std::sin(angle), 0.0f, 0.0f,
-		-std::sin(angle), std::cos(angle), 0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f,
-	};
-
 	HRESULT hr = S_OK;
 
 	// Setup device and swap chain
@@ -240,16 +232,14 @@ void Graphics::SetViewport(float x, float y, float width, float height)
 	mContext->RSSetViewports(1, &vp);
 }
 
-void Graphics::DrawTestTriangle()
+void Graphics::DrawTestTriangle(float x, float y)
 {
 	angle = time.Peek();
-	cb =
-	{
-		(3.0f/4.0f)*std::cos(angle), std::sin(angle), 0.0f, 0.0f,
-		(3.0f/4.0f)*-std::sin(angle), std::cos(angle), 0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f,
-	};
+	Matrix4 vhat = Matrix4::CreateScale(3.0f / 4.0f) * Matrix4::CreateRotationZ(angle) * Matrix4::CreateTranslation(Vector3(x, y, 0.0f));
+	vhat.Transpose();
+	cb.modelToWorld = vhat;
+	
+
 	// Update object buffer
 	UploadBuffer(mConstBuffer, &cb, sizeof(cb));
 

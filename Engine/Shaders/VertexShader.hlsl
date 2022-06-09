@@ -1,6 +1,6 @@
 cbuffer ObjConstants
 {
-	row_major float4x4 modelToWorld;
+	float4x4 modelToWorld;
 };
 
 struct VSOut

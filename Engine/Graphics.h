@@ -2,10 +2,11 @@
 #include <d3d11.h>
 #include "VertexFormats.h"
 #include "LoopTimer.h"
+#include "EngineMath.h"
 
 struct ConstBuffer
 {
-	float transMatrix[4][4];
+	Matrix4 modelToWorld;
 };
 
 class Shader;
@@ -31,7 +32,7 @@ public:
 
 	void SetViewport(float x, float y, float width, float height);
 
-	void DrawTestTriangle();
+	void DrawTestTriangle(float x, float y);
 
 private:
 	// TEST TRIANGLE STUFF---------------------
