@@ -176,6 +176,7 @@
     <ClCompile Include="Engine\Window.cpp" />
     <ClCompile Include="Engine\WindowException.cpp" />
     <ClCompile Include="Engine\Shader.cpp" />
+    <ClCompile Include="Engine\Math.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\App.h" />
@@ -191,6 +192,7 @@
     <ClInclude Include="Engine\WindowException.h" />
     <ClInclude Include="Engine\VertexFormats.h" />
     <ClInclude Include="Engine\Shader.h" />
+    <ClInclude Include="Engine\Math.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Engine\Engine.rc" />

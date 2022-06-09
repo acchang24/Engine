@@ -47,6 +47,9 @@
     <ClCompile Include="Engine\Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Math.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\stdafx.h">
@@ -85,7 +88,12 @@
     <ClInclude Include="Engine\VertexFormats.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Shader.h" />
+    <ClInclude Include="Engine\Shader.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Engine\Engine.rc">

@@ -4,7 +4,6 @@
 #include "Shader.h"
 #include <cmath>
 
-
 #pragma comment (lib, "d3d11.lib") 
 #pragma comment(lib, "d3dCompiler.lib")
 
