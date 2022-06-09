@@ -5,12 +5,6 @@
 #include "EngineMath.h"
 
 class RenderObj;
-
-struct ConstBuffer
-{
-	Matrix4 modelToWorld;
-};
-
 class Shader;
 
 class Graphics
@@ -58,28 +52,15 @@ public:
 	// Getter for depth stencil view
 	ID3D11DepthStencilView* GetDepthStencilView() { return mDepthStencilView; }
 
-	// Clear z buffer
+	// Clear z-buffer
 	void ClearDepthBuffer(ID3D11DepthStencilView* depthView, float depth);
-
-	void DrawTestTriangle(float x, float y, float z, float dir);
-
-	Shader* mShader;
-	Shader* mCubeShader;
 
 private:
 	static Graphics* sGraphics;
 
-	// TEST TRIANGLE STUFF---------------------
-	RenderObj* testCube;
-
-	ID3D11Buffer* mConstColorBuffer;
-
 	float screenWidth;
 	float screenHeight;
 
-	float angle = 0.0f;
-
-	// Normal stuff
 	IDXGISwapChain* mSwapChain;
 	ID3D11Device* mDevice;
 	ID3D11DeviceContext* mContext;
@@ -90,7 +71,5 @@ private:
 	// Z-buffer
 	ID3D11Texture2D* mDepthTexture;
 	ID3D11DepthStencilView* mDepthStencilView;
-
-	LoopTimer time;
 };
 

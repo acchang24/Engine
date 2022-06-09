@@ -2,6 +2,11 @@
 #include "Window.h"
 #include "LoopTimer.h"
 
+// App is the main class that starts the game loop/engine
+
+class Shader;
+class RenderObj;
+
 class App
 {
 public:
@@ -15,9 +20,18 @@ public:
 
 	// Start game loop
 	int Run();
-private:
+
+	void Update(float deltaTime);
 	void RenderFrame();
 
+private:
+	RenderObj* testCube;
+	RenderObj* testCube2;
+	Shader* mShader;
+	Shader* mCubeShader;
+	ID3D11Buffer* mConstColorBuffer;
+
+	float angle = 0.0f;
 	float zoom = 0.0f;
 
 	bool running;

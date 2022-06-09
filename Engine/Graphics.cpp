@@ -6,74 +6,19 @@
 #include "RenderObj.h"
 #include "VertexBuffer.h"
 
-
 #pragma comment (lib, "d3d11.lib") 
 #pragma comment(lib, "d3dCompiler.lib")
 
 Graphics* Graphics::sGraphics = nullptr;
-
-const Vertex vertices[] =
-{
-	{ -1.0f, -1.0f, -1.0f, Color4(1.0f, 0.0f, 0.0f, 1.0f)},
-	{ 1.0f, -1.0f, -1.0f, Color4(0.0f, 1.0f, 0.0f, 1.0f)},
-	{ -1.0f, 1.0f, -1.0f, Color4(0.0f, 0.0f, 1.0f, 1.0f)},
-	{ 1.0f, 1.0f, -1.0f, Color4(1.0f, 1.0f, 0.0f, 1.0f)},
-	{ -1.0f, -1.0f, 1.0f, Color4(1.0f, 0.0f, 1.0f, 1.0f)},
-	{ 1.0f, -1.0f, 1.0f, Color4(0.0f, 1.0f, 1.0f, 1.0f)},
-	{ -1.0f, 1.0f, 1.0f, Color4(0.0f, 0.0f, 0.0f, 1.0f)},
-	{ 1.0f, 1.0f, 1.0f, Color4(1.0f, 1.0f, 1.0f, 1.0f)},
-};
-
-const Point points[] =
-{
-	{ -1.0f, -1.0f, -1.0f},
-	{ 1.0f, -1.0f, -1.0f},
-	{ -1.0f, 1.0f, -1.0f},
-	{ 1.0f, 1.0f, -1.0f},
-	{ -1.0f, -1.0f, 1.0f},
-	{ 1.0f, -1.0f, 1.0f},
-	{ -1.0f, 1.0f, 1.0f},
-	{ 1.0f, 1.0f, 1.0f},
-};
-
-const uint16_t indices[] =
-{
-	0, 2, 1, 
-	2, 3, 1,
-	1, 3, 5,
-	3, 7, 5,
-	2, 6, 3,
-	3, 6, 7,
-	4, 5, 7,
-	4, 7, 6,
-	0, 4, 2,
-	2, 4, 6,
-	0, 1, 4,
-	1, 5, 4,
-};
-
-const Color4 cb2[] =
-{
-	{Color4(1.0f, 0.0f, 1.0f, 1.0f)},
-	{Color4(1.0f, 0.0f, 0.0f, 1.0f)},
-	{Color4(0.0f, 1.0f, 0.0f, 1.0f)},
-	{Color4(0.0f, 0.0f, 1.0f, 1.0f)},
-	{Color4(1.0f, 1.0f, 0.0f, 1.0f)},
-	{Color4(0.0f, 1.0f, 1.0f, 1.0f)},
-};
 
 Graphics::Graphics()
 	: mSwapChain(nullptr)
 	, mDevice(nullptr)
 	, mContext(nullptr)
 	, mBackBuffer(nullptr)
-	, mShader(nullptr)
-	, mConstColorBuffer(nullptr)
-	, mCubeShader(nullptr)
 	, mDepthTexture(nullptr)
 	, mDepthStencilView(nullptr)
 	, mCurrentRenderTarget(nullptr)
-	, testCube(nullptr)
 	, screenWidth(0.0f)
 	, screenHeight(0.0f)
 {
@@ -105,18 +50,6 @@ Graphics::~Graphics()
 	{
 		mDevice->Release();
 	}
-	if (mShader)
-	{
-		delete mShader;
-	}
-	if (mConstColorBuffer)
-	{
-		mConstColorBuffer->Release();
-	}
-	if (mCubeShader)
-	{
-		delete mCubeShader;
-	}
 	if (mDepthStencilView)
 	{
 		mDepthStencilView->Release();
@@ -124,10 +57,6 @@ Graphics::~Graphics()
 	if (mDepthTexture)
 	{
 		mDepthTexture->Release();
-	}
-	if (testCube)
-	{
-		delete testCube;
 	}
 
 #ifdef _DEBUG
@@ -138,6 +67,9 @@ Graphics::~Graphics()
 
 void Graphics::InitD3D(HWND hWnd, float width, float height)
 {
+	screenWidth = width;
+	screenHeight = height;
+
 	HRESULT hr = S_OK;
 
 	// Setup device and swap chain
@@ -197,39 +129,9 @@ void Graphics::InitD3D(HWND hWnd, float width, float height)
 
 	// Draw triangle lists(groups of 3 vertices)
 	mContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	// Create a render obj
-	testCube = new RenderObj(new VertexBuffer(vertices, sizeof(vertices), sizeof(Vertex), indices, sizeof(indices), sizeof(uint16_t)));
 	
-	// Shader
-	mShader = new Shader(this);
-
-	mCubeShader = new Shader(this);
-
-	const D3D11_INPUT_ELEMENT_DESC ied[] =
+	// Z Buffer
 	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-	};
-
-	const D3D11_INPUT_ELEMENT_DESC colorIed[] =
-	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-	};
-
-	mShader->Load(L"Engine/Shaders/VertexShader.hlsl", ShaderType::Vertex, ied, sizeof(ied) / sizeof(ied[0]));
-	mShader->Load(L"Engine/Shaders/PixelShader.hlsl", ShaderType::Pixel, ied, sizeof(ied) / sizeof(ied[0]));
-
-	mCubeShader->Load(L"Engine/Shaders/CubeVS.hlsl", ShaderType::Vertex, colorIed, sizeof(colorIed) / sizeof(colorIed[0]));
-	mCubeShader->Load(L"Engine/Shaders/CubePS.hlsl", ShaderType::Pixel, colorIed, sizeof(colorIed) / sizeof(colorIed[0]));
-
-
-	mCubeShader->SetActive();
-
-	//mShader->SetActive();
-
-	{
-		// Z Buffer
 		// Create Depth Stencil State
 		ID3D11DepthStencilState* depthState = CreateDepthStencilState(D3D11_COMPARISON_LESS);
 		// Set Depth Stencil State
@@ -237,12 +139,9 @@ void Graphics::InitD3D(HWND hWnd, float width, float height)
 		// Release depth state
 		depthState->Release();
 
-		// Depth Stencil
+		// Create Depth Stencil
 		CreateDepthStencil((int)width, (int)height, &mDepthTexture, &mDepthStencilView);
 	}
-
-	// Create the const color buffer
-	mConstColorBuffer = CreateGraphicsBuffer(&cb2, sizeof(cb2), 0, D3D11_BIND_CONSTANT_BUFFER, D3D11_CPU_ACCESS_WRITE, D3D11_USAGE_DYNAMIC);
 }
 
 
@@ -396,19 +295,4 @@ bool Graphics::CreateDepthStencil(int inWidth, int inHeight, ID3D11Texture2D** p
 void Graphics::ClearDepthBuffer(ID3D11DepthStencilView* depthView, float depth)
 {
 	mContext->ClearDepthStencilView(depthView, 1, depth, 1);
-}
-
-void Graphics::DrawTestTriangle(float x, float y, float z, float dir)
-{
-	angle = Math::Pi * time.Peek();
-	Matrix4 transform = Matrix4::CreateRotationZ(0.0f) * Matrix4::CreateRotationY(dir * angle) * Matrix4::CreateRotationX(dir * 0.25f * angle)
-		* Matrix4::CreateTranslation(Vector3(x, y, z + 4.0f))
-		* Matrix4::CreatePerspectiveFOV(Math::ToRadians(90.0f), 1.0f, 3.0f/4.0f, 1.0f, 10000.0f);
-	transform.Transpose();
-	testCube->mObjConsts.modelToWorld = transform;
-
-	// bind constant color buffer to pixel shader
-	mContext->PSSetConstantBuffers(0, 1, &mConstColorBuffer);
-
-	testCube->Draw();
 }
