@@ -4,6 +4,8 @@
 #include "LoopTimer.h"
 #include "EngineMath.h"
 
+class VertexBuffer;
+
 struct ConstBuffer
 {
 	Matrix4 modelToWorld;
@@ -19,6 +21,8 @@ public:
 	Graphics(const Graphics&) = delete;
 	Graphics& operator=(const Graphics&) = delete;
 
+	static Graphics* Get() { return sGraphics; }
+
 	void InitD3D(HWND hWnd, float width, float height);
 
 	void SetBuffer(ID3D11RenderTargetView* targetBuffer, ID3D11DepthStencilView* dsv);
@@ -29,11 +33,15 @@ public:
 	// Present swap chain
 	void EndFrame();
 
+	// Getters for screen dimensions
+	float GetScreenWidth () { return screenWidth; }
+	float GetScreenHeight() { return screenHeight; }
+
 	// Getters for D3D Device and Device Context
 	ID3D11Device* GetDevice() { return mDevice; }
 	ID3D11DeviceContext* GetContext() { return mContext; }
 
-	// Create adn upload a buffer
+	// Create and upload a buffer
 	ID3D11Buffer* CreateGraphicsBuffer(const void* initData, UINT byteWidth, UINT structByteStride, D3D11_BIND_FLAG inBindFlag, D3D11_CPU_ACCESS_FLAG inCPUAccessFlags, D3D11_USAGE inUsage);
 	void UploadBuffer(ID3D11Buffer* buffer, const void* data, UINT dataSize);
 
@@ -53,17 +61,22 @@ public:
 	// Clear z buffer
 	void ClearDepthBuffer(ID3D11DepthStencilView* depthView, float depth);
 
-	void DrawTestTriangle(float x, float y, float dir);
+	void DrawTestTriangle(float x, float y, float z, float dir);
+
+	Shader* mShader;
+	Shader* mCubeShader;
 
 private:
+	static Graphics* sGraphics;
+
 	// TEST TRIANGLE STUFF---------------------
-	ID3D11Buffer* mTriVertexBuffer;
-	Shader* mShader;
-	ID3D11Buffer* mIndexBuffer;
+	VertexBuffer* vBuffer;
+
 	ID3D11Buffer* mConstBuffer;
 	ID3D11Buffer* mConstColorBuffer;
 
-	Shader* mCubeShader;
+	float screenWidth;
+	float screenHeight;
 
 	// Z-buffer
 	ID3D11Texture2D* mDepthTexture;

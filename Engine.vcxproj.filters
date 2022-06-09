@@ -50,6 +50,12 @@
     <ClCompile Include="Engine\EngineMath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\RenderObj.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\VertexBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\stdafx.h">
@@ -92,6 +98,12 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\EngineMath.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderObj.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\VertexBuffer.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -5,9 +5,6 @@
 #include <iomanip>
 #include <codecvt>
 
-#define WINWIDTH 800
-#define WINHEIGHT 600
-
 int APIENTRY wWinMain(
 	_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,

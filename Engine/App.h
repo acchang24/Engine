@@ -18,6 +18,8 @@ public:
 private:
 	void RenderFrame();
 
+	float zoom = 0.0f;
+
 	bool running;
 	Window* wnd;
 	LoopTimer timer;

@@ -2,9 +2,10 @@
 #include "App.h"
 #include <iomanip>
 #include "Graphics.h"
+#include "Shader.h"
 
-#define WINWIDTH 800
-#define WINHEIGHT 600
+#define WINWIDTH 1250
+#define WINHEIGHT 750
 
 App::App()
 {
@@ -52,53 +53,55 @@ int App::Run()
 				break;
 			}
 
-			/*static int i = 0;
-			while (!wnd.mMouse->IsEmpty())
+			static int i = 0;
+			while (!wnd->mMouse->IsEmpty())
 			{
-				const auto e = wnd.mMouse->Read();
+				const auto e = wnd->mMouse->Read();
 				switch (e.GetType())
 				{
-				case Mouse::Event::Type::Leave:
-					wnd.SetTitle(L"GONE");
+				/*case Mouse::Event::Type::Leave:
+					wnd->SetTitle(L"GONE");
 					break;
 				case Mouse::Event::Type::Move:
-				{
-					std::ostringstream oss;
-					oss << "Mouse Position: (" << e.GetX() << ", " << e.GetY() << ")";
-					std::string s = oss.str();
-					std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-					std::wstring ws = converter.from_bytes(s);
-					wnd.SetTitle(ws);
-				}
-				break;
+					{
+						std::ostringstream oss;
+						oss << "Mouse Position: (" << e.GetX() << ", " << e.GetY() << ")";
+						std::string s = oss.str();
+						std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+						std::wstring ws = converter.from_bytes(s);
+						wnd->SetTitle(ws);
+					}
+					break;*/
 				case Mouse::Event::Type::WheelUp:
-					i++;
+					zoom += 0.2f;
+					/*i++;
 					{
 						std::stringstream oss;
 						oss << "Up: " << i;
 						std::string s = oss.str();
 						std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 						std::wstring ws = converter.from_bytes(s);
-						wnd.SetTitle(ws);
-					}
+						wnd->SetTitle(ws);
+					}*/
 					break;
 				case Mouse::Event::Type::WheelDown:
-					i--;
+					zoom -= 0.2f;
+					/*i--;
 					{
 						std::stringstream oss;
 						oss << "Down: " << i;
 						std::string s = oss.str();
 						std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 						std::wstring ws = converter.from_bytes(s);
-						wnd.SetTitle(ws);
-					}
+						wnd->SetTitle(ws);
+					}*/
 					break;
 				}
 			}
-			if (wnd.mKeyboard->KeyIsPressed('A'))
+			if (wnd->mKeyboard->KeyIsPressed('A'))
 			{
 				MessageBox(nullptr, L"Something HapponNN!", L"A Key Was Pressed", MB_OK | MB_ICONEXCLAMATION);
-			}*/
+			}
 		}
 
 		if (running)
@@ -130,18 +133,20 @@ void App::RenderFrame()
 {
 	Graphics* g = wnd->GetGraphics();
 
-	const float c = sin(timer.Peek()) / 2.0f + 0.5f;
-	
 	// set render target
 	g->SetBuffer(g->GetBackBuffer(), g->GetDepthStencilView());
 
-	g->ClearBuffer(c, c, 1.0f);
+	g->ClearBuffer(0.0f, 0.0f, 0.0f);
 
 	g->ClearDepthBuffer(g->GetDepthStencilView(), 1.0f);
 
-	g->DrawTestTriangle(0.0f, 0.0f, 1.0f);
+	g->mShader->SetActive();
 
-	g->DrawTestTriangle(wnd->mMouse->GetPosX() / 400.0f - 1.0f, -wnd->mMouse->GetPosY() / 300.0f + 1.0f, -1.0f);
+	g->DrawTestTriangle(0.0f, 0.0f, 0.0f, 1.0f);
+
+	g->mCubeShader->SetActive();
+
+	g->DrawTestTriangle(wnd->mMouse->GetPosX() / 400.0f - 1.0f, -wnd->mMouse->GetPosY() / 300.0f + 1.0f, zoom, -1.0f);
 
 	g->EndFrame();
 }

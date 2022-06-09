@@ -1,13 +1,15 @@
 #include "stdafx.h"
 #include <d3dcompiler.h>
+#include <cmath>
 #include "Graphics.h"
 #include "Shader.h"
-#include <cmath>
+#include "VertexBuffer.h"
+
 
 #pragma comment (lib, "d3d11.lib") 
 #pragma comment(lib, "d3dCompiler.lib")
 
-
+Graphics* Graphics::sGraphics = nullptr;
 
 const Vertex vertices[] =
 {
@@ -64,8 +66,6 @@ Graphics::Graphics()
 	, mDevice(nullptr)
 	, mContext(nullptr)
 	, mBackBuffer(nullptr)
-	, mTriVertexBuffer(nullptr)
-	, mIndexBuffer(nullptr)
 	, mShader(nullptr)
 	, mConstBuffer(nullptr)
 	, mConstColorBuffer(nullptr)
@@ -73,64 +73,65 @@ Graphics::Graphics()
 	, mDepthTexture(nullptr)
 	, mDepthStencilView(nullptr)
 	, mCurrentRenderTarget(nullptr)
+	, vBuffer(nullptr)
+	, screenWidth(0.0f)
+	, screenHeight(0.0f)
 {
+	sGraphics = this;
 }
 
 Graphics::~Graphics()
 {
+	sGraphics = nullptr;
 #ifdef _DEBUG
 	ID3D11Debug* pDbg = nullptr;
 	HRESULT hr = mDevice->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&pDbg));
 	DbgAssert(S_OK == hr, "Unable to create debug device");
 #endif
 
-	if (mBackBuffer != nullptr)
+	if (mBackBuffer)
 	{
 		mBackBuffer->Release();
 	}
-	if (mContext != nullptr)
+	if (mContext)
 	{
 		mContext->Release();
 	}
-	if (mSwapChain != nullptr)
+	if (mSwapChain)
 	{
 		mSwapChain->Release();
 	}
-	if (mDevice != nullptr)
+	if (mDevice)
 	{
 		mDevice->Release();
 	}
-	if (mTriVertexBuffer != nullptr)
-	{
-		mTriVertexBuffer->Release();
-	}
-	if (mIndexBuffer != nullptr)
-	{
-		mIndexBuffer->Release();
-	}
-	if (mShader != nullptr)
+	if (mShader)
 	{
 		delete mShader;
 	}
-	if (mConstBuffer != nullptr)
+	if (mConstBuffer)
 	{
 		mConstBuffer->Release();
 	}
-	if (mConstColorBuffer != nullptr)
+	if (mConstColorBuffer)
 	{
 		mConstColorBuffer->Release();
 	}
-	if (mCubeShader != nullptr)
+	if (mCubeShader)
 	{
 		delete mCubeShader;
 	}
-	if (mDepthStencilView != nullptr)
+	if (mDepthStencilView)
 	{
 		mDepthStencilView->Release();
 	}
-	if (mDepthTexture != nullptr)
+	if (mDepthTexture)
 	{
 		mDepthTexture->Release();
+	}
+	if (vBuffer)
+	{
+		delete vBuffer;
 	}
 
 #ifdef _DEBUG
@@ -184,7 +185,7 @@ void Graphics::InitD3D(HWND hWnd, float width, float height)
 	}
 
 	// Set the viewport
-	SetViewport(0.0f, 0.0f, 800.0f, 600.0f);
+	SetViewport(0.0f, 0.0f, width, height);
 
 	// Grab the back buffer (access texture subresource in swap chain)
 	{
@@ -201,11 +202,10 @@ void Graphics::InitD3D(HWND hWnd, float width, float height)
 	// Draw triangle lists(groups of 3 vertices)
 	mContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+	// Create a VertexBuffer
+	vBuffer = new VertexBuffer(vertices, sizeof(vertices), sizeof(Vertex), indices, sizeof(indices), sizeof(uint16_t));
 
-
-	// Create a vertex buffer
-	mTriVertexBuffer = CreateGraphicsBuffer(vertices, sizeof(vertices), sizeof(Vertex), D3D11_BIND_VERTEX_BUFFER, D3D11_CPU_ACCESS_WRITE, D3D11_USAGE_DYNAMIC);
-
+	
 	// Shader
 	mShader = new Shader(this);
 
@@ -246,10 +246,6 @@ void Graphics::InitD3D(HWND hWnd, float width, float height)
 		CreateDepthStencil((int)width, (int)height, &mDepthTexture, &mDepthStencilView);
 	}
 
-
-
-	// Create a index buffer
-	mIndexBuffer = CreateGraphicsBuffer(indices, sizeof(indices), sizeof(uint16_t), D3D11_BIND_INDEX_BUFFER, D3D11_CPU_ACCESS_WRITE, D3D11_USAGE_DYNAMIC);
 
 	// Create const buffer
 	mConstBuffer = CreateGraphicsBuffer(&cb, sizeof(cb), 0, D3D11_BIND_CONSTANT_BUFFER, D3D11_CPU_ACCESS_WRITE, D3D11_USAGE_DYNAMIC);
@@ -412,12 +408,12 @@ void Graphics::ClearDepthBuffer(ID3D11DepthStencilView* depthView, float depth)
 	mContext->ClearDepthStencilView(depthView, 1, depth, 1);
 }
 
-void Graphics::DrawTestTriangle(float x, float y, float dir)
+void Graphics::DrawTestTriangle(float x, float y, float z, float dir)
 {
 	angle = Math::Pi * time.Peek();
 	Matrix4 transform = Matrix4::CreateRotationZ(0.0f) * Matrix4::CreateRotationY(dir * angle) * Matrix4::CreateRotationX(dir * 0.25f * angle)
-		* Matrix4::CreateTranslation(Vector3(x, 0, y + 4.0f))
-		* Matrix4::CreatePerspectiveFOV(Math::ToRadians(70.0f), 1.0f, 3.0f/4.0f, 0.5f, 10.0f);
+		* Matrix4::CreateTranslation(Vector3(x, y, z + 4.0f))
+		* Matrix4::CreatePerspectiveFOV(Math::ToRadians(90.0f), 1.0f, 3.0f/4.0f, 1.0f, 10000.0f);
 	transform.Transpose();
 	cb.modelToWorld = transform;
 	
@@ -425,21 +421,11 @@ void Graphics::DrawTestTriangle(float x, float y, float dir)
 	// Update object buffer
 	UploadBuffer(mConstBuffer, &cb, sizeof(cb));
 
-	// Bind render target
-	mContext->OMSetRenderTargets(1u, &mBackBuffer, mDepthStencilView);
-
 	// bind constant buffer to vertex shader
 	mContext->VSSetConstantBuffers(0, 1, &mConstBuffer);
 
 	// bind constant color buffer to pixel shader
 	mContext->PSSetConstantBuffers(0, 1, &mConstColorBuffer);
 
-	// Draw
-	const UINT stride = sizeof(Vertex);
-	const UINT offset = 0u;
-	// Bind vertex buffer
-	mContext->IASetVertexBuffers(0, 1, &mTriVertexBuffer, &stride, &offset);
-	// Bind index buffer
-	mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, 0u);
-	mContext->DrawIndexed(sizeof(indices) / sizeof(uint16_t), 0u, 0u);
+	vBuffer->Draw();
 }
