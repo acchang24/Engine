@@ -18,7 +18,7 @@ int APIENTRY wWinMain(
 	float time = 0.0f;
 	try
 	{
-		return App{}.Go();
+		return App{}.Run();
 	}
 	catch (const Exception& e)
 	{

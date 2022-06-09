@@ -9,11 +9,11 @@ struct VSOut
 	float4 color : COLOR;
 };
 
-VSOut main(float2 pos : POSITION, float4 color : COLOR) 
+VSOut main(float3 pos : POSITION, float4 color : COLOR) 
 {
 	VSOut output;
 
-	output.pos = mul(float4(pos.x, pos.y, 0.0f, 1.0f),modelToWorld);
+	output.pos = mul(float4(pos.x, pos.y, pos.z, 1.0f),modelToWorld);
 	output.color = color;
 
 	return output;

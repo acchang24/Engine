@@ -11,9 +11,10 @@ public:
 	App& operator=(const App&) = delete;
 
 	void Init();
+	void ShutDown();
 
 	// Start game loop
-	int Go();
+	int Run();
 private:
 	void RenderFrame();
 

@@ -49,6 +49,7 @@ HINSTANCE Window::WindowClass::GetInstance()
 Window::Window(int width, int height, const wchar_t* name) 
 	: mWidth(width)
 	, mHeight(height)
+	, mGraphics(nullptr)
 {
 	mKeyboard = new Keyboard();
 	mMouse = new Mouse();
@@ -86,13 +87,15 @@ Window::Window(int width, int height, const wchar_t* name)
 	ShowWindow(hWnd, SW_SHOWDEFAULT);
 
 	// Create Graphics object
-	mGraphics = std::make_unique<Graphics>(hWnd);
+	mGraphics = new Graphics();
+	mGraphics->InitD3D(hWnd, (float)width, (float)height);
 }
 
 Window::~Window()
 {
 	delete mKeyboard;
 	delete mMouse;
+	delete mGraphics;
 	// Destroys window
 	//DestroyWindow(hWnd);
 }

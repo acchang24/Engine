@@ -15,6 +15,11 @@ public:
 
 struct Vertex
 {
-    float x, y;
+    float x, y, z;
     Color4 color;
+};
+
+struct Point
+{
+    float x, y, z;
 };

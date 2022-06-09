@@ -1,5 +1,7 @@
 #pragma once
+#include <cmath>
 #include <smmintrin.h>
+#include <cstring>
 
 // SHUFFLER is like shuffle, but has easier to understand indices
 #define _MM_SHUFFLER( xi, yi, zi, wi ) _MM_SHUFFLE( wi, zi, yi, xi )

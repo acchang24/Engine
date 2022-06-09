@@ -15,7 +15,7 @@ public:
 
 	void SetTitle(const std::wstring& title);
 
-	Graphics& GetGraphics() { return *mGraphics; }
+	Graphics* GetGraphics() { return mGraphics; }
 
 	Keyboard* mKeyboard;
 	Mouse* mMouse;
@@ -45,5 +45,5 @@ private:
 	int mWidth;
 	int mHeight;
 	HWND hWnd;
-	std::unique_ptr<Graphics> mGraphics;
+	Graphics* mGraphics;
 };
