@@ -3,9 +3,29 @@
 #include "Graphics.h"
 #include "Shader.h"
 #include "VertexBuffer.h"
+#include "App.h"
+#include <random>
 
-Cube::Cube() : RenderObj()
+Cube::Cube(App* app) : RenderObj(app)
 {
+	std::mt19937 rng(std::random_device{}());
+	std::uniform_real_distribution<float> adist(0.0f, 3.1415f * 2.0f);
+	std::uniform_real_distribution<float> ddist(0.0f, 3.1415f * 2.0f);
+	std::uniform_real_distribution<float> odist(0.0f, 3.1415f * 0.3f);
+	std::uniform_real_distribution<float> rdist(6.0f, 20.0f);
+
+	r = rdist(rng);
+	droll = ddist(rng);
+	dpitch = ddist(rng);
+	dyaw = ddist(rng);
+	dphi = odist(rng);
+	dtheta = odist(rng);
+	dchi = odist(rng);
+	chi = adist(rng);
+	theta = adist(rng);
+	phi = adist(rng);
+
+
 	mVertexBuffer = new VertexBuffer(pps, sizeof(pps), sizeof(Vector3), indices, sizeof(indices), sizeof(uint16_t));
 	
 	mConstBuffer = Graphics::Get()->CreateGraphicsBuffer(
@@ -37,7 +57,22 @@ Cube::~Cube()
 
 void Cube::Update(float deltaTime)
 {
+	roll += droll * deltaTime;
+	pitch += dpitch * deltaTime;
+	yaw += dyaw * deltaTime;
+	theta += dtheta * deltaTime;
+	phi += dphi * deltaTime;
+	chi += dchi * deltaTime;
 
+	// Calculate transform
+	Matrix4 mat = Matrix4::CreateYawPitchRoll(yaw, pitch, roll) 
+		* Matrix4::CreateTranslation(Vector3(r, 0.0f, 0.0f))
+		* Matrix4::CreateYawPitchRoll(theta, phi, chi) 
+		* Matrix4::CreateTranslation(Vector3(0.0f, 0.0f, 20.0f))
+		* Matrix4::CreatePerspectiveFOV(Math::ToRadians(90.0f), 1.0f, 9.0f / 16.0f, 1.0f, 10000.0f);
+	mat.Transpose();
+
+	mObjConsts.modelToWorld = mat;
 }
 
 void Cube::Draw()

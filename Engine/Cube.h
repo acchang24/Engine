@@ -2,6 +2,8 @@
 #include "RenderObj.h"
 #include "VertexFormats.h"
 
+class App;
+
 const Vector3 pps[] =
 {
 	{Vector3(-1.0f, -1.0f, -1.0f)},
@@ -43,7 +45,7 @@ const Color4 cb2[] =
 class Cube : public RenderObj
 {
 public:
-	Cube();
+	Cube(App* app);
 	~Cube();
 
 	void Update(float deltaTime) override;

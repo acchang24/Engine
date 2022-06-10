@@ -193,6 +193,8 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			const POINTS pt = MAKEPOINTS(lParam);
 			mMouse->OnLeftClick(pt.x, pt.y);
+			// Bring the window to front on left click client region
+			SetForegroundWindow(hWnd);
 			break;
 		}
 		case WM_RBUTTONDOWN:

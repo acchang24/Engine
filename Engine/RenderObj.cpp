@@ -3,8 +3,9 @@
 #include "Graphics.h"
 #include "VertexBuffer.h"
 #include "Shader.h"
+#include "App.h"
 
-RenderObj::RenderObj() 
+RenderObj::RenderObj(App* app) 
 	: mVertexBuffer(nullptr)
 	, mConstBuffer(nullptr)
 	, mShader(nullptr)
@@ -12,15 +13,18 @@ RenderObj::RenderObj()
 	, scale(0.0f)
 	, rotation(0.0f)
 {
+	app->AddRenderObj(this);
 }
 
-RenderObj::RenderObj(const VertexBuffer* vBuffer, Shader* shader) 
+RenderObj::RenderObj(const VertexBuffer* vBuffer, Shader* shader, App* app) 
 	: mVertexBuffer(vBuffer)
 	, mShader(shader)
 	, pos(Vector3::Zero)
 	, scale(0.0f)
 	, rotation(0.0f)
 {
+	app->AddRenderObj(this);
+
 	mConstBuffer = Graphics::Get()->CreateGraphicsBuffer(
 		&mObjConsts,
 		sizeof(mObjConsts),

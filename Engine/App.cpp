@@ -14,6 +14,7 @@
 App::App()
 	: testCube(nullptr)
 	, testCube2(nullptr)
+	, testCube3(nullptr)
 	, mConstColorBuffer(nullptr)
 {
 	wnd = new Window(WINWIDTH, WINHEIGHT, L"Engine");
@@ -56,7 +57,7 @@ void App::Init()
 	};
 
 	// Shader
-	Shader* mShader = new Shader();
+	/*Shader* mShader = new Shader();
 
 	const D3D11_INPUT_ELEMENT_DESC ied[] =
 	{
@@ -65,23 +66,28 @@ void App::Init()
 	};
 
 	mShader->Load(L"Engine/Shaders/VertexShader.hlsl", ShaderType::Vertex, ied, sizeof(ied) / sizeof(ied[0]));
-	mShader->Load(L"Engine/Shaders/PixelShader.hlsl", ShaderType::Pixel, ied, sizeof(ied) / sizeof(ied[0]));
+	mShader->Load(L"Engine/Shaders/PixelShader.hlsl", ShaderType::Pixel, ied, sizeof(ied) / sizeof(ied[0]));*/
 
 	// Create a render objects
-	testCube = new RenderObj(new VertexBuffer(vertices, sizeof(vertices), sizeof(Vertex), indices, sizeof(indices), sizeof(uint16_t)), mShader);
-	testCube2 = new Cube();
+	//testCube = new RenderObj(new VertexBuffer(vertices, sizeof(vertices), sizeof(Vertex), indices, sizeof(indices), sizeof(uint16_t)), mShader, this);
+	testCube2 = new Cube(this);
+	testCube3 = new Cube(this);
+
+	for (int i = 0; i < 80; i++)
+	{
+		Cube* newCube = new Cube(this);
+	}
+
 }
 
 void App::ShutDown()
 {
-	if (testCube)
+	while (!renderObjects.empty())
 	{
-		delete testCube;
+		delete renderObjects.back();
+		renderObjects.pop_back();
 	}
-	if (testCube2)
-	{
-		delete testCube2;
-	}
+
 	if (mConstColorBuffer)
 	{
 		mConstColorBuffer->Release();
@@ -159,10 +165,8 @@ int App::Run()
 			float deltaTime = (float)(0.000000001 * duration);
 			start = end;
 
-
-			//time += deltaTime;
-			/*fps = (int)(1.0f / deltaTime);
-			std::ostringstream oss;
+			fps = (int)(1.0f / deltaTime);
+			/*std::ostringstream oss;
 			oss << "FPS: " << fps;
 			std::string str = oss.str();
 			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
@@ -183,22 +187,34 @@ void App::Update(float deltaTime)
 {
 	angle += Math::Pi * deltaTime;
 
-	Matrix4 transform = Matrix4::CreateRotationZ(0.0f) * Matrix4::CreateRotationY(angle) * Matrix4::CreateRotationX(0.25f * angle)
-		* Matrix4::CreateTranslation(Vector3(0.0f, 0.0f, 0.0f + 4.0f))
-		* Matrix4::CreatePerspectiveFOV(Math::ToRadians(100.0f), 1.0f, 9.0f / 16.0f, 1.0f, 10000.0f);
-	transform.Transpose();
-	testCube->mObjConsts.modelToWorld = transform;
+	for (auto o : renderObjects)
+	{
+		o->Update(deltaTime);
+	}
 
-	Matrix4 transform1 = Matrix4::CreateRotationZ(0.0f) * Matrix4::CreateRotationY(-angle) * Matrix4::CreateRotationX(0.25f * -angle)
-		* Matrix4::CreateTranslation(Vector3(0.0f, 0.0f, 0.0f + 4.0f))
-		* Matrix4::CreatePerspectiveFOV(Math::ToRadians(100.0f), 1.0f, 9.0f / 16.0f, 1.0f, 10000.0f);
+	/*Matrix4 transform = Matrix4::CreateRotationZ(0.0f) * Matrix4::CreateRotationY(angle) * Matrix4::CreateRotationX(0.25f * angle)
+		* Matrix4::CreateTranslation(Vector3(0.0f, 0.0f, 4.0f))
+		* Matrix4::CreatePerspectiveFOV(Math::ToRadians(100.0f), 1.0f, 0.75f, 0.5f, 40.0f);
+	transform.Transpose();
+
+	Matrix4 transform1 = Matrix4::CreateRotationZ(0.0f) * Matrix4::CreateRotationY(angle) * Matrix4::CreateRotationX(0.25f * angle)
+		* Matrix4::CreateTranslation(Vector3(4.0f, 0.0f, 4.0f))
+		* Matrix4::CreatePerspectiveFOV(Math::ToRadians(100.0f), 1.0f, 0.75f, 0.5f, 40.0f);
 	transform1.Transpose();
 
-	Matrix4 transform2 = Matrix4::CreateRotationZ(0.0f) * Matrix4::CreateRotationY(-angle) * Matrix4::CreateRotationX(0.25f * -angle)
+	Matrix4 transform2 = Matrix4::CreateRotationZ(0.0f) * Matrix4::CreateRotationY(angle) * Matrix4::CreateRotationX(0.25f * angle)
+		* Matrix4::CreateTranslation(Vector3(-4.0f, 0.0f, 4.0f))
+		* Matrix4::CreatePerspectiveFOV(Math::ToRadians(100.0f), 1.0f, 0.75f, 0.5f, 40.0f);
+	transform2.Transpose();
+
+	Matrix4 transform3 = Matrix4::CreateRotationZ(0.0f) * Matrix4::CreateRotationY(-angle) * Matrix4::CreateRotationX(0.25f * -angle)
 		* Matrix4::CreateTranslation(Vector3(wnd->mMouse->GetPosX() / (wnd->GetGraphics()->GetScreenWidth() /2.0f) - 1.0f, -wnd->mMouse->GetPosY() / (wnd->GetGraphics()->GetScreenHeight()/2.0f) + 1.0f, zoom + 4.0f))
 		* Matrix4::CreatePerspectiveFOV(Math::ToRadians(100.0f), 1.0f, 9.0f / 16.0f, 1.0f, 10000.0f);
-	transform2.Transpose();
+	transform3.Transpose();
+
+	testCube->mObjConsts.modelToWorld = transform;
 	testCube2->mObjConsts.modelToWorld = transform1;
+	testCube3->mObjConsts.modelToWorld = transform2;*/
 }
 
 void App::RenderFrame()
@@ -215,8 +231,15 @@ void App::RenderFrame()
 		g->ClearDepthBuffer(g->GetDepthStencilView(), 1.0f);
 	}
 
-	testCube->Draw();
-	testCube2->Draw();
+	for (auto o : renderObjects)
+	{
+		o->Draw();
+	}
 
 	g->EndFrame();
+}
+
+void App::AddRenderObj(RenderObj* obj)
+{
+	renderObjects.push_back(obj);
 }

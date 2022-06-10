@@ -25,9 +25,14 @@ public:
 	void Update(float deltaTime);
 	void RenderFrame();
 
+	void AddRenderObj(RenderObj* obj);
+
 private:
 	RenderObj* testCube;
 	Cube* testCube2;
+	Cube* testCube3;
+
+	std::vector<RenderObj*> renderObjects;
 
 	ID3D11Buffer* mConstColorBuffer;
 

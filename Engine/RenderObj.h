@@ -1,6 +1,7 @@
 #pragma once
 #include "EngineMath.h"
 
+class App;
 class VertexBuffer;
 class Shader;
 
@@ -13,8 +14,8 @@ struct ObjectConstants
 class RenderObj
 {
 public:
-	RenderObj();
-	RenderObj(const VertexBuffer* vBuffer, Shader* shader);
+	RenderObj(App* app);
+	RenderObj(const VertexBuffer* vBuffer, Shader* shader, App* app);
 	virtual ~RenderObj();
 	RenderObj(const RenderObj&) = delete;
 	RenderObj& operator=(const RenderObj&) = delete;
@@ -47,5 +48,13 @@ protected:
 	float theta = 0.0f;
 
 	float r = 0.0f;
+
+	float droll = 0.0f;
+	float dpitch = 0.0f;
+	float dyaw = 0.0f;
+	float dphi = 0.0f;
+	float dtheta = 0.0f;
+	float dchi = 0.0f;
+
 };
 
