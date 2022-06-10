@@ -1,7 +1,4 @@
-cbuffer ObjConstants
-{
-	float4x4 modelToWorld;
-};
+#include "ShaderConstants.hlsli"
 
 float4 main(float3 pos : POSITION) : SV_POSITION
 {

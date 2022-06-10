@@ -10,6 +10,13 @@ class Shader;
 class Graphics
 {
 public:
+
+	enum ConstantBuffer
+	{
+		CONSTANT_BUFFER_RENDEROBJ,
+		CONSTANT_BUFFER_CUBE_COLOR,
+	};
+
 	Graphics();
 	~Graphics();
 	Graphics(const Graphics&) = delete;

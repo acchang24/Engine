@@ -78,7 +78,7 @@ void Cube::Update(float deltaTime)
 void Cube::Draw()
 {
 	// Set color const to pixel shader
-	Graphics::Get()->GetContext()->PSSetConstantBuffers(0, 1, &mConstColorBuffer);
+	Graphics::Get()->GetContext()->PSSetConstantBuffers(Graphics::ConstantBuffer::CONSTANT_BUFFER_CUBE_COLOR, 1, &mConstColorBuffer);
 
 	mShader->SetActive();
 
@@ -88,7 +88,7 @@ void Cube::Draw()
 	graphics->UploadBuffer(mConstBuffer, &mObjConsts, sizeof(mObjConsts));
 
 	// Bind constant buffer to vertex shader
-	graphics->GetContext()->VSSetConstantBuffers(0, 1, &mConstBuffer);
+	graphics->GetContext()->VSSetConstantBuffers(Graphics::ConstantBuffer::CONSTANT_BUFFER_RENDEROBJ, 1, &mConstBuffer);
 
 	mVertexBuffer->Draw();
 }

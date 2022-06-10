@@ -1,20 +1,23 @@
-cbuffer ObjConstants
+#include "ShaderConstants.hlsli"
+
+struct VertexIn
 {
-	float4x4 modelToWorld;
+	float3 pos : POSITION;
+	float4 color : COLOR;
 };
 
-struct VSOut
+struct VertexOut
 {
 	float4 pos : SV_POSITION;
 	float4 color : COLOR;
 };
 
-VSOut main(float3 pos : POSITION, float4 color : COLOR) 
+VertexOut main(VertexIn vIn)
 {
-	VSOut output;
+	VertexOut output;
 
-	output.pos = mul(float4(pos.x, pos.y, pos.z, 1.0f),modelToWorld);
-	output.color = color;
+	output.pos = mul(float4(vIn.pos.x, vIn.pos.y, vIn.pos.z, 1.0f), modelToWorld);
+	output.color = vIn.color;
 
 	return output;
 }

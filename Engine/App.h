@@ -29,8 +29,6 @@ public:
 
 private:
 	RenderObj* testCube;
-	Cube* testCube2;
-	Cube* testCube3;
 
 	std::vector<RenderObj*> renderObjects;
 

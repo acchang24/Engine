@@ -65,7 +65,7 @@ void RenderObj::Draw()
 	graphics->UploadBuffer(mConstBuffer, &mObjConsts, sizeof(mObjConsts));
 
 	// Bind constant buffer to vertex shader
-	graphics->GetContext()->VSSetConstantBuffers(0, 1, &mConstBuffer);
+	graphics->GetContext()->VSSetConstantBuffers(Graphics::ConstantBuffer::CONSTANT_BUFFER_RENDEROBJ, 1, &mConstBuffer);
 
 	mVertexBuffer->Draw();
 }

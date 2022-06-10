@@ -13,8 +13,6 @@
 
 App::App()
 	: testCube(nullptr)
-	, testCube2(nullptr)
-	, testCube3(nullptr)
 	, mConstColorBuffer(nullptr)
 {
 	wnd = new Window(WINWIDTH, WINHEIGHT, L"Engine");
@@ -57,7 +55,7 @@ void App::Init()
 	};
 
 	// Shader
-	/*Shader* mShader = new Shader();
+	Shader* mShader = new Shader();
 
 	const D3D11_INPUT_ELEMENT_DESC ied[] =
 	{
@@ -66,12 +64,10 @@ void App::Init()
 	};
 
 	mShader->Load(L"Engine/Shaders/VertexShader.hlsl", ShaderType::Vertex, ied, sizeof(ied) / sizeof(ied[0]));
-	mShader->Load(L"Engine/Shaders/PixelShader.hlsl", ShaderType::Pixel, ied, sizeof(ied) / sizeof(ied[0]));*/
+	mShader->Load(L"Engine/Shaders/PixelShader.hlsl", ShaderType::Pixel, ied, sizeof(ied) / sizeof(ied[0]));
 
 	// Create a render objects
-	//testCube = new RenderObj(new VertexBuffer(vertices, sizeof(vertices), sizeof(Vertex), indices, sizeof(indices), sizeof(uint16_t)), mShader, this);
-	testCube2 = new Cube(this);
-	testCube3 = new Cube(this);
+	testCube = new RenderObj(new VertexBuffer(vertices, sizeof(vertices), sizeof(Vertex), indices, sizeof(indices), sizeof(uint16_t)), mShader, this);
 
 	for (int i = 0; i < 80; i++)
 	{
@@ -215,6 +211,11 @@ void App::Update(float deltaTime)
 	testCube->mObjConsts.modelToWorld = transform;
 	testCube2->mObjConsts.modelToWorld = transform1;
 	testCube3->mObjConsts.modelToWorld = transform2;*/
+	Matrix4 transform = Matrix4::CreateRotationZ(0.0f) * Matrix4::CreateRotationY(angle) * Matrix4::CreateRotationX(0.25f * angle)
+		* Matrix4::CreateTranslation(Vector3(0.0f, 0.0f, zoom + 4.0f))
+		* Matrix4::CreatePerspectiveFOV(Math::ToRadians(100.0f), 1.0f, 0.75f, 0.5f, 40.0f);
+	transform.Transpose();
+	testCube->mObjConsts.modelToWorld = transform;
 }
 
 void App::RenderFrame()
