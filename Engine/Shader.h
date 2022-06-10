@@ -12,7 +12,7 @@ enum class ShaderType
 class Shader
 {
 public:
-	Shader(Graphics* g);
+	Shader();
 	~Shader();
 	Shader(const Shader&) = delete;
 	Shader& operator=(const Shader&) = delete;
@@ -22,8 +22,6 @@ public:
 	void SetActive() const;
 
 private:
-	Graphics* mGraphics;
-
 	ID3D11VertexShader* mVS;
 	ID3D11PixelShader* mPS;
 	ID3D11InputLayout* mInputLayout;

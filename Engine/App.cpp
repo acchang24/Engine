@@ -11,9 +11,7 @@
 #define WINHEIGHT 720
 
 App::App()
-	: mShader(nullptr)
-	, mCubeShader(nullptr)
-	, testCube(nullptr)
+	: testCube(nullptr)
 	, testCube2(nullptr)
 	, mConstColorBuffer(nullptr)
 {
@@ -66,14 +64,10 @@ void App::Init()
 		{Color4(0.0f, 1.0f, 1.0f, 1.0f)},
 	};
 
-	// Create a render obj
-	testCube = new RenderObj(new VertexBuffer(vertices, sizeof(vertices), sizeof(Vertex), indices, sizeof(indices), sizeof(uint16_t)));
-	testCube2 = new RenderObj(new VertexBuffer(vertices, sizeof(vertices), sizeof(Vertex), indices, sizeof(indices), sizeof(uint16_t)));
-
 	// Shader
-	mShader = new Shader(wnd->GetGraphics());
+	Shader* mShader = new Shader();
 
-	mCubeShader = new Shader(wnd->GetGraphics());
+	Shader* mCubeShader = new Shader();
 
 	const D3D11_INPUT_ELEMENT_DESC ied[] =
 	{
@@ -92,21 +86,16 @@ void App::Init()
 	mCubeShader->Load(L"Engine/Shaders/CubeVS.hlsl", ShaderType::Vertex, colorIed, sizeof(colorIed) / sizeof(colorIed[0]));
 	mCubeShader->Load(L"Engine/Shaders/CubePS.hlsl", ShaderType::Pixel, colorIed, sizeof(colorIed) / sizeof(colorIed[0]));
 
+	// Create a render obj
+	testCube = new RenderObj(new VertexBuffer(vertices, sizeof(vertices), sizeof(Vertex), indices, sizeof(indices), sizeof(uint16_t)), mShader);
+	testCube2 = new RenderObj(new VertexBuffer(vertices, sizeof(vertices), sizeof(Vertex), indices, sizeof(indices), sizeof(uint16_t)), mCubeShader);
+
 	// Create the const color buffer
 	mConstColorBuffer = wnd->GetGraphics()->CreateGraphicsBuffer(&cb2, sizeof(cb2), 0, D3D11_BIND_CONSTANT_BUFFER, D3D11_CPU_ACCESS_WRITE, D3D11_USAGE_DYNAMIC);
 }
 
 void App::ShutDown()
 {
-	
-	if (mShader)
-	{
-		delete mShader;
-	}
-	if (mCubeShader)
-	{
-		delete mCubeShader;
-	}
 	if (testCube)
 	{
 		delete testCube;
@@ -194,8 +183,8 @@ int App::Run()
 
 
 			//time += deltaTime;
-			fps = (int)(1.0f / deltaTime);
-			/*std::ostringstream oss;
+			/*fps = (int)(1.0f / deltaTime);
+			std::ostringstream oss;
 			oss << "FPS: " << fps;
 			std::string str = oss.str();
 			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
@@ -243,12 +232,7 @@ void App::RenderFrame()
 		g->ClearDepthBuffer(g->GetDepthStencilView(), 1.0f);
 	}
 
-	mShader->SetActive();
-
 	testCube->Draw();
-
-	//mCubeShader->SetActive();
-
 	testCube2->Draw();
 
 	// Set color const to pixel shader

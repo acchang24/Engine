@@ -27,8 +27,7 @@ public:
 private:
 	RenderObj* testCube;
 	RenderObj* testCube2;
-	Shader* mShader;
-	Shader* mCubeShader;
+
 	ID3D11Buffer* mConstColorBuffer;
 
 	float angle = 0.0f;

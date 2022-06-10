@@ -1,19 +1,22 @@
 #include "stdafx.h"
 #include "RenderObj.h"
-#include "VertexBuffer.h"
 #include "Graphics.h"
+#include "VertexBuffer.h"
+#include "Shader.h"
 
 RenderObj::RenderObj() 
 	: mVertexBuffer(nullptr)
 	, mConstBuffer(nullptr)
+	, mShader(nullptr)
 	, pos(Vector3::Zero)
 	, scale(0.0f)
 	, rotation(0.0f)
 {
 }
 
-RenderObj::RenderObj(const VertexBuffer* vBuffer) 
+RenderObj::RenderObj(const VertexBuffer* vBuffer, Shader* shader) 
 	: mVertexBuffer(vBuffer)
+	, mShader(shader)
 	, pos(Vector3::Zero)
 	, scale(0.0f)
 	, rotation(0.0f)
@@ -29,9 +32,18 @@ RenderObj::RenderObj(const VertexBuffer* vBuffer)
 
 RenderObj::~RenderObj()
 {
-	delete mVertexBuffer;
-
-	mConstBuffer->Release();
+	if (mVertexBuffer)
+	{
+		delete mVertexBuffer;
+	}
+	if (mShader)
+	{
+		delete mShader;
+	}
+	if (mConstBuffer)
+	{
+		mConstBuffer->Release();
+	}
 }
 
 void RenderObj::Update(float deltaTime)
@@ -41,6 +53,8 @@ void RenderObj::Update(float deltaTime)
 
 void RenderObj::Draw()
 {
+	mShader->SetActive();
+
 	Graphics* graphics = Graphics::Get();
 
 	// Update const buffer with current data and upload tp GPU

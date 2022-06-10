@@ -5,9 +5,8 @@
 
 #pragma comment(lib, "d3dCompiler.lib")
 
-Shader::Shader(Graphics* g)
-	: mGraphics(g)
-	, mVS(nullptr)
+Shader::Shader()
+	: mVS(nullptr)
 	, mPS(nullptr)
 	, mInputLayout(nullptr)
 {
@@ -76,6 +75,8 @@ static bool LoadShader(const WCHAR* filename, const char* entryPoint, const char
 
 bool Shader::Load(const WCHAR* fileName, ShaderType type, const D3D11_INPUT_ELEMENT_DESC* layoutArray, int numLayoutElements)
 {
+    Graphics* g = Graphics::Get();
+
     HRESULT hr = S_OK;
     ID3DBlob* pBlob = nullptr;
     if (LoadShader(fileName, "main", shaderModels[type], pBlob))
@@ -83,17 +84,17 @@ bool Shader::Load(const WCHAR* fileName, ShaderType type, const D3D11_INPUT_ELEM
         switch (type)
         {
         case ShaderType::Vertex:
-            hr = mGraphics->GetDevice()->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &mVS);
+            hr = g->GetDevice()->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &mVS);
             DbgAssert(hr == S_OK, "Failed to create vertex shader");
             break;
         case ShaderType::Pixel:
-            hr = mGraphics->GetDevice()->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &mPS);
+            hr = g->GetDevice()->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &mPS);
             DbgAssert(hr == S_OK, "Failed to create pixel shader");
             break;
         }
         if (mInputLayout == nullptr)
         {
-            hr = mGraphics->GetDevice()->CreateInputLayout(layoutArray, numLayoutElements, pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &mInputLayout);
+            hr = g->GetDevice()->CreateInputLayout(layoutArray, numLayoutElements, pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &mInputLayout);
             DbgAssert(hr == S_OK, "Failed to create input layout");
         }
         if (S_OK == hr)
@@ -106,7 +107,8 @@ bool Shader::Load(const WCHAR* fileName, ShaderType type, const D3D11_INPUT_ELEM
 
 void Shader::SetActive() const
 {
-	mGraphics->GetContext()->VSSetShader(mVS, nullptr, 0);
-	mGraphics->GetContext()->PSSetShader(mPS, nullptr, 0);
-	mGraphics->GetContext()->IASetInputLayout(mInputLayout);
+    Graphics* g = Graphics::Get();
+	g->GetContext()->VSSetShader(mVS, nullptr, 0);
+	g->GetContext()->PSSetShader(mPS, nullptr, 0);
+	g->GetContext()->IASetInputLayout(mInputLayout);
 }
