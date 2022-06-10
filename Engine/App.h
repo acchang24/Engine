@@ -34,6 +34,8 @@ private:
 	float angle = 0.0f;
 	float zoom = 0.0f;
 
+	int fps = 0;
+
 	bool running;
 	Window* wnd;
 	LoopTimer timer;

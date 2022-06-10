@@ -18,13 +18,22 @@ public:
 	RenderObj(const RenderObj&) = delete;
 	RenderObj& operator=(const RenderObj&) = delete;
 
+	virtual void Update(float deltaTime);
+
 	virtual void Draw();
 
 	ObjectConstants mObjConsts;
 
 protected:
+	// Buffers
 	const VertexBuffer* mVertexBuffer;
-
 	ID3D11Buffer* mConstBuffer;
+
+	// Object info
+	Vector3 pos;
+	float scale;
+	float rotation;
+
+
 };
 

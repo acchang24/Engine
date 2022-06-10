@@ -3,11 +3,20 @@
 #include "VertexBuffer.h"
 #include "Graphics.h"
 
-RenderObj::RenderObj() : mVertexBuffer(nullptr), mConstBuffer(nullptr)
+RenderObj::RenderObj() 
+	: mVertexBuffer(nullptr)
+	, mConstBuffer(nullptr)
+	, pos(Vector3::Zero)
+	, scale(0.0f)
+	, rotation(0.0f)
 {
 }
 
-RenderObj::RenderObj(const VertexBuffer* vBuffer) : mVertexBuffer(vBuffer)
+RenderObj::RenderObj(const VertexBuffer* vBuffer) 
+	: mVertexBuffer(vBuffer)
+	, pos(Vector3::Zero)
+	, scale(0.0f)
+	, rotation(0.0f)
 {
 	mConstBuffer = Graphics::Get()->CreateGraphicsBuffer(
 		&mObjConsts,
@@ -23,6 +32,11 @@ RenderObj::~RenderObj()
 	delete mVertexBuffer;
 
 	mConstBuffer->Release();
+}
+
+void RenderObj::Update(float deltaTime)
+{
+
 }
 
 void RenderObj::Draw()
