@@ -1,5 +1,4 @@
 #pragma once
-#include "Graphics.h"
 
 class Color4
 {
@@ -17,9 +16,4 @@ struct Vertex
 {
     float x, y, z;
     Color4 color;
-};
-
-struct Point
-{
-    float x, y, z;
 };

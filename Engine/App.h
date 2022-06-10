@@ -6,6 +6,7 @@
 
 class Shader;
 class RenderObj;
+class Cube;
 
 class App
 {
@@ -26,7 +27,7 @@ public:
 
 private:
 	RenderObj* testCube;
-	RenderObj* testCube2;
+	Cube* testCube2;
 
 	ID3D11Buffer* mConstColorBuffer;
 
@@ -36,6 +37,7 @@ private:
 	int fps = 0;
 
 	bool running;
+
 	Window* wnd;
 	LoopTimer timer;
 };

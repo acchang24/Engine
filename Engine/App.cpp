@@ -3,9 +3,10 @@
 #include <iomanip>
 #include "Graphics.h"
 #include "EngineMath.h"
+#include "VertexBuffer.h"
 #include "Shader.h"
 #include "RenderObj.h"
-#include "VertexBuffer.h"
+#include "Cube.h"
 
 #define WINWIDTH 1280
 #define WINHEIGHT 720
@@ -54,20 +55,8 @@ void App::Init()
 		1, 5, 4,
 	};
 
-	const Color4 cb2[] =
-	{
-		{Color4(1.0f, 0.0f, 1.0f, 1.0f)},
-		{Color4(1.0f, 0.0f, 0.0f, 1.0f)},
-		{Color4(0.0f, 1.0f, 0.0f, 1.0f)},
-		{Color4(0.0f, 0.0f, 1.0f, 1.0f)},
-		{Color4(1.0f, 1.0f, 0.0f, 1.0f)},
-		{Color4(0.0f, 1.0f, 1.0f, 1.0f)},
-	};
-
 	// Shader
 	Shader* mShader = new Shader();
-
-	Shader* mCubeShader = new Shader();
 
 	const D3D11_INPUT_ELEMENT_DESC ied[] =
 	{
@@ -75,23 +64,12 @@ void App::Init()
 		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
 
-	const D3D11_INPUT_ELEMENT_DESC colorIed[] =
-	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-	};
-
 	mShader->Load(L"Engine/Shaders/VertexShader.hlsl", ShaderType::Vertex, ied, sizeof(ied) / sizeof(ied[0]));
 	mShader->Load(L"Engine/Shaders/PixelShader.hlsl", ShaderType::Pixel, ied, sizeof(ied) / sizeof(ied[0]));
 
-	mCubeShader->Load(L"Engine/Shaders/CubeVS.hlsl", ShaderType::Vertex, colorIed, sizeof(colorIed) / sizeof(colorIed[0]));
-	mCubeShader->Load(L"Engine/Shaders/CubePS.hlsl", ShaderType::Pixel, colorIed, sizeof(colorIed) / sizeof(colorIed[0]));
-
-	// Create a render obj
+	// Create a render objects
 	testCube = new RenderObj(new VertexBuffer(vertices, sizeof(vertices), sizeof(Vertex), indices, sizeof(indices), sizeof(uint16_t)), mShader);
-	testCube2 = new RenderObj(new VertexBuffer(vertices, sizeof(vertices), sizeof(Vertex), indices, sizeof(indices), sizeof(uint16_t)), mCubeShader);
-
-	// Create the const color buffer
-	mConstColorBuffer = wnd->GetGraphics()->CreateGraphicsBuffer(&cb2, sizeof(cb2), 0, D3D11_BIND_CONSTANT_BUFFER, D3D11_CPU_ACCESS_WRITE, D3D11_USAGE_DYNAMIC);
+	testCube2 = new Cube();
 }
 
 void App::ShutDown()
@@ -211,11 +189,16 @@ void App::Update(float deltaTime)
 	transform.Transpose();
 	testCube->mObjConsts.modelToWorld = transform;
 
+	Matrix4 transform1 = Matrix4::CreateRotationZ(0.0f) * Matrix4::CreateRotationY(-angle) * Matrix4::CreateRotationX(0.25f * -angle)
+		* Matrix4::CreateTranslation(Vector3(0.0f, 0.0f, 0.0f + 4.0f))
+		* Matrix4::CreatePerspectiveFOV(Math::ToRadians(100.0f), 1.0f, 9.0f / 16.0f, 1.0f, 10000.0f);
+	transform1.Transpose();
+
 	Matrix4 transform2 = Matrix4::CreateRotationZ(0.0f) * Matrix4::CreateRotationY(-angle) * Matrix4::CreateRotationX(0.25f * -angle)
 		* Matrix4::CreateTranslation(Vector3(wnd->mMouse->GetPosX() / (wnd->GetGraphics()->GetScreenWidth() /2.0f) - 1.0f, -wnd->mMouse->GetPosY() / (wnd->GetGraphics()->GetScreenHeight()/2.0f) + 1.0f, zoom + 4.0f))
 		* Matrix4::CreatePerspectiveFOV(Math::ToRadians(100.0f), 1.0f, 9.0f / 16.0f, 1.0f, 10000.0f);
 	transform2.Transpose();
-	testCube2->mObjConsts.modelToWorld = transform2;
+	testCube2->mObjConsts.modelToWorld = transform1;
 }
 
 void App::RenderFrame()
@@ -234,9 +217,6 @@ void App::RenderFrame()
 
 	testCube->Draw();
 	testCube2->Draw();
-
-	// Set color const to pixel shader
-	g->GetContext()->PSSetConstantBuffers(0, 1, &mConstColorBuffer);
 
 	g->EndFrame();
 }

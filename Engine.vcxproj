@@ -155,6 +155,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Cube.cpp" />
     <ClCompile Include="Engine\App.cpp" />
     <ClCompile Include="Engine\DbgAssert.cpp" />
     <ClCompile Include="Engine\Exception.cpp" />
@@ -181,6 +182,7 @@
     <ClCompile Include="Engine\VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Cube.h" />
     <ClInclude Include="Engine\App.h" />
     <ClInclude Include="Engine\DbgAssert.h" />
     <ClInclude Include="Engine\Exception.h" />

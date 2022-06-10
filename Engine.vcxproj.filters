@@ -56,6 +56,9 @@
     <ClCompile Include="Engine\VertexBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Cube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\stdafx.h">
@@ -104,6 +107,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\VertexBuffer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Cube.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
