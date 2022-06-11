@@ -62,6 +62,10 @@ public:
 	// Clear z-buffer
 	void ClearDepthBuffer(ID3D11DepthStencilView* depthView, float depth);
 
+	void SetActiveTexture(int slot, ID3D11ShaderResourceView* pView);
+
+	void SetSamplerState(int slot, ID3D11SamplerState* pSampler);
+
 private:
 	static Graphics* sGraphics;
 
@@ -72,11 +76,14 @@ private:
 	ID3D11Device* mDevice;
 	ID3D11DeviceContext* mContext;
 	
-	ID3D11RenderTargetView* mBackBuffer;
 	ID3D11RenderTargetView* mCurrentRenderTarget;
+	ID3D11RenderTargetView* mBackBuffer;
 
 	// Z-buffer
 	ID3D11Texture2D* mDepthTexture;
 	ID3D11DepthStencilView* mDepthStencilView;
+
+	// Texture Sampler
+	ID3D11SamplerState* mSamplerState;
 };
 

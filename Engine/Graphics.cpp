@@ -15,10 +15,11 @@ Graphics::Graphics()
 	: mSwapChain(nullptr)
 	, mDevice(nullptr)
 	, mContext(nullptr)
+	, mCurrentRenderTarget(nullptr)
 	, mBackBuffer(nullptr)
 	, mDepthTexture(nullptr)
 	, mDepthStencilView(nullptr)
-	, mCurrentRenderTarget(nullptr)
+	, mSamplerState(nullptr)
 	, screenWidth(0.0f)
 	, screenHeight(0.0f)
 {
@@ -295,4 +296,14 @@ bool Graphics::CreateDepthStencil(int inWidth, int inHeight, ID3D11Texture2D** p
 void Graphics::ClearDepthBuffer(ID3D11DepthStencilView* depthView, float depth)
 {
 	mContext->ClearDepthStencilView(depthView, 1, depth, 1);
+}
+
+void Graphics::SetActiveTexture(int slot, ID3D11ShaderResourceView* pView)
+{
+	mContext->PSSetShaderResources(slot, 1, &pView);
+}
+
+void Graphics::SetSamplerState(int slot, ID3D11SamplerState* pSampler)
+{
+	mContext->PSSetSamplers(slot, 1, &pSampler);
 }

@@ -10,6 +10,8 @@ public:
 
 	void Free();
 
+	bool Load(const WCHAR* fileName);
+
 	void SetActive(int slot) const;
 
 private:
