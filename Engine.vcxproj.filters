@@ -130,12 +130,12 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Engine\Shaders\VertexShader.hlsl" />
-    <FxCompile Include="Engine\Shaders\PixelShader.hlsl" />
-    <FxCompile Include="Engine\Shaders\CubePS.hlsl" />
-    <FxCompile Include="Engine\Shaders\CubeVS.hlsl" />
+    <FxCompile Include="Shaders\CubePS.hlsl" />
+    <FxCompile Include="Shaders\CubeVS.hlsl" />
+    <FxCompile Include="Shaders\PixelShader.hlsl" />
+    <FxCompile Include="Shaders\VertexShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Engine\Shaders\ShaderConstants.hlsli" />
+    <None Include="Shaders\ShaderConstants.hlsli" />
   </ItemGroup>
 </Project>
